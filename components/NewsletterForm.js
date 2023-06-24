@@ -35,7 +35,9 @@ const NewsletterForm = ({ title = 'Subscribe to the newsletter' }) => {
   }
 
   return (
-    <div></div>
+    <div>
+      <p></p>
+    </div>
   )
 }
 
