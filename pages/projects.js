@@ -13,7 +13,7 @@ export default function Projects() {
             Projects
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            Showcase your projects with a hero image (16 x 9)
+            All of my projects are open source and available on my <a href="https://github.com/theflash2k"><u>Github</u></a> profile.
           </p>
         </div>
         <div className="container py-12">
