@@ -56,7 +56,7 @@ passwords = re.findall("<li>(.*?)</li>", r.text)
 
 Now, we need to send the data to the login page, so, using Chrome dev tools, we firstly identify the `POST` request being sent to the server:
 
-![DevTools](/static/writeups/aupctf/web/conundrum_requests.png)
+![DevTools](/static/writeups/aupctf/web/conundrum_request.png)
 
 Now, here, we can see that, we have a `csrfmiddlewaretoken`. So, for that, we need to send a `GET` request to the login page, and extract the `csrfmiddlewaretoken` from the response, and then, with each request, we need to send the `csrfmiddlewaretoken` as well. Also, we will need the `csrftoken` cookie set as well and a `referer` header set to the login page. So, for that, I wrote the following final script.
 
