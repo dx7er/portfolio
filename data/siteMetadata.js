@@ -2,7 +2,7 @@ const siteMetadata = {
   title: 'TheFlash2k Portfolio',
   author: 'Ali Taqi Wajid',
   headerTitle: 'TheFlash2k',
-  description: 'A blog/portfolio for Ali Taqi Wajid',
+  description: 'All my thoughts/ideas in one place',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://theflashk2k.me',

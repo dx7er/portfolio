@@ -53,7 +53,7 @@ with open('wordlist.txt', 'w') as file:
 
 Now, since we have a wordlist, what will we do now? Well, we can solve it using `John The Ripper` or `Hashcat`. I'll be using `Hashcat` for this challenge. So, let's get started.
 
-Firstly, we need to conver the `.7z` into a format that hashcat will understand. I used the following [tool](https://github.com/philsmd/7z2hashcat/) to convert the 3`.7z` file into a `hash` file that hashcat could understand. 
+Firstly, we need to convert the `.7z` into a format that hashcat will understand. I used the following [tool](https://github.com/philsmd/7z2hashcat/) to convert the `.7z` file into a `hash` file that hashcat could understand. 
 
 ```bash
 7z2hashcat64-1.9.exe encrypted.7z  > hash
