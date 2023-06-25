@@ -1,12 +1,12 @@
 ---
 title: AUPCTF'23 - Web - Conundrum
-date: '2023-06-24'
-tags: ['ctf', 'web', 'aupctf', 'writeup']
+date: '2023-06-25'
+tags: ['ctf', 'web', 'aupctf', 'writeup', 'brute-force', 'csrf']
 draft: false
 summary: A detailed writeup for the web challenge `Conundrum` from AUPCTF'23
 ---
 
-# AUPCTF'23 - Web - Conundrum
+## Solution
 
 We're given the following URL to work with:
 
