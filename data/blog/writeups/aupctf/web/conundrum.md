@@ -16,11 +16,11 @@ https://challs.aupctf.live/conundrum/
 
 Upon visiting the URL, we're greeted with a login page:
 
-![Login Page](./images/conundrum_login.png)
+![Login Page](/static/writeups/aupctf/web/conundrum_login.png)
 
 We can try to login with some random credentials, but we're greeted with the following error:
 
-![Error Login Page](./images/conundrum_err_login.png)
+![Error Login Page](/static/writeups/aupctf/web/conundrum_err_login.png)
 
 Using a `CTF` mindset, we try and visit some obvious pages, first, we visit robots.txt and get the following:
 
@@ -32,11 +32,11 @@ Disallow: /passwords/
 
 We visit the `/usernames/` directory and get the following:
 
-![Usernames](./images/conundrum_usernames.png)
+![Usernames](/static/writeups/aupctf/web/conundrum_usernames.png)
 
 Similarly, for passwords:
 
-![Passwords](./images/conundrum_passwords.png)
+![Passwords](/static/writeups/aupctf/web/conundrum_passwords.png)
 
 Now, to extract the username and passwords, I wrote the following python script:
 
@@ -56,7 +56,7 @@ passwords = re.findall("<li>(.*?)</li>", r.text)
 
 Now, we need to send the data to the login page, so, using Chrome dev tools, we firstly identify the `POST` request being sent to the server:
 
-![DevTools](./images/conundrum_requests.png)
+![DevTools](/static/writeups/aupctf/web/conundrum_requests.png)
 
 Now, here, we can see that, we have a `csrfmiddlewaretoken`. So, for that, we need to send a `GET` request to the login page, and extract the `csrfmiddlewaretoken` from the response, and then, with each request, we need to send the `csrfmiddlewaretoken` as well. Also, we will need the `csrftoken` cookie set as well and a `referer` header set to the login page. So, for that, I wrote the following final script.
 
@@ -178,15 +178,16 @@ Response: <!DOCTYPE html>
 
 Now, with the following credentials, `starlord69:1A8$5k7!eR`, we are able to login successfully:
 
-![Login Success](./images/conundrum_login_success.png)
+
+![Login Success](/static/writeups/aupctf/web/conundrum_login_success.png)
 
 Now, the message is pretty vague. I tried several different stuff. Finally, with a hint from the admins and a fellow hacker, I tried the two things and one of them worked
 
 1. Adding a seperate `admin: 1` header in the http request
 2. Adding a `admin=true` parameter in the POST request data (SPOILER, it worked.)
 
-![burp_test](./images/conundrum_burp.png)
-![Flag](./images/conundrum_flag.png)
+![burp_test](/static/writeups/aupctf/web/conundrum_burp.png)
+![Flag](/static/writeups/aupctf/web/conundrum_flag.png)
 
 So, since I love to automate everything, the final script to extract the flag became:
 
