@@ -44,12 +44,11 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 - **4th Place** in ICYWSC'22 organized by FAST University, on-site in Islamabad (2022)
 - **2nd Place** in Digital Pakistan Cyber Security Hackathon organized by MoITT and IGNITE, on-site in Islamabad (2021) [Network attacks and Exploitation]
 - **3rd Place** in Digital Pakistan Cyber Security Hackathon organized by MoITT and IGNITE, on-site in Islamabad (2021) [Speed Programming]
-- **Red Team Lead** in Air University Cyber Security Society, Islamabad (2021 - 2023)
 
 ## Projects
 
 - [**Raidware**](https://github.com/theflash2k/Raidware) - A Complete Command and Control (C2) Framework capable of generating payloads for all the major operating systems i.e. Windows, Linux and macOS. This was developed as the Final Year Project for my Bachelors degree.
-- [**SillyRAT**](https://github.com/hash3liZer/SillyRAT) - This was developed with the [Shameer Kashif](https://shameerkashif.me/) (a dear friend of mine) as a part of our OOP Course Project. It is a cross-platform Remote Access Trojan capable of performing stealth operations and AV Evasion written originally in C++ and ported to Python.
+- [**SillyRAT**](https://github.com/hash3liZer/SillyRAT) - This was developed with [Shameer Kashif](https://shameerkashif.me/) (a dear friend of mine) as a part of our OOP Course Project. It is a cross-platform Remote Access Trojan capable of performing stealth operations and AV Evasion written originally in C++ and ported to Python.
 - [**bRAT**](https://github.com/theflash2k/brat) - A C++ based cross-platform Remote Access Trojan capable of performing stealth operations and AV Evasion. (Deprecated and left out)
 - [**METH**](https://github.com/theflash2k/meth) - A Python3 based Packet Sniffer with capabilities to sniff raw TCP, UDP, HTTP, ICMP, FTP, SSH, SFTP packets and filter them using Berkley filters
 - [**RevShell**](https://github.com/theflash2k/revshell) - A Python3 based reverse-shell generator. It is capable of generating reverse shell in multiple different languages such as PHP, Python etc
