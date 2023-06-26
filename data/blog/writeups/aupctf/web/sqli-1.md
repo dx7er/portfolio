@@ -3,7 +3,7 @@ title: AUPCTF'23 - Web - SQLi 1
 date: '2023-06-25'
 tags: ['ctf', 'web', 'aupctf', 'sqli', 'login-bypass']
 draft: false
-summary: 
+summary: Basic SQL Injection to bypass login
 ---
 
 ## Solution

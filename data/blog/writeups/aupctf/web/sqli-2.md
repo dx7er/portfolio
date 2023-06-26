@@ -3,7 +3,7 @@ title: AUPCTF'23 - Web - SQLi 2
 date: '2023-06-25'
 tags: ['ctf', 'web', 'aupctf', 'sqli', 'login-bypass']
 draft: false
-summary: 
+summary: Another basic SQLi to bypass to admin panel
 ---
 
 ## Solution

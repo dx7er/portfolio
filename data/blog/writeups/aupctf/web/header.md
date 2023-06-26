@@ -3,7 +3,7 @@ title: AUPCTF'23 - Web - Header
 date: '2023-06-25'
 tags: ['ctf', 'web', 'aupctf', 'writeup', 'django', 'http-headers']
 draft: false
-summary: 
+summary: The name of challenge was a hint towards HTTP Headers, so we just had to send a custom header to get the flag
 ---
 
 ## Challenge Description

@@ -1,5 +1,5 @@
 const siteMetadata = {
-  title: 'TheFlash2k Portfolio',
+  title: 'TheFlash2k',
   author: 'Ali Taqi Wajid',
   headerTitle: 'TheFlash2k',
   description: 'All my thoughts/ideas in one place',
