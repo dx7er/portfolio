@@ -282,10 +282,10 @@ print(io.recv())
 
 ```
 
-![Alt text](../../../../../public/static/writeups/blackhatmea23-quals/image-6.png)
+![Alt text](/static/writeups/blackhatmea23-quals/image-6.png)
 
 Well, we can now see that `HELLO`, along with two memory addresses (one is `nil`) has been printed out. This confirms that we have successfully overwritten `free` with `printf` and we have the Format String Bug.
 
 ### Leaking the libc address using the fsb vulnerability
 
-Now, we have a Format String Bug, which can give us address leaks. What we have to do now, is find the base-address of the binary. 
+Now, we have a Format String Bug, which can give us address leaks. What we have to do now, is find the base-address of the binary.
