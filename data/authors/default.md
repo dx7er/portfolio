@@ -1,29 +1,27 @@
 ---
 name: Ali Taqi Wajid
 avatar: /static/images/phlesh.jpg
-occupation: DevSecOps Engineer
+occupation: A CTF Player & DevSecOps Engineer
 email: root@theflash2k.me
 twitter: https://twitter.com/alitaqiwajid
 linkedin: https://www.linkedin.com/in/ali-taqi-wajid
 github: https://github.com/theflash2k
 ---
 
-# 👋 I'm Taqi a.k.a TheFlash2k ⚡
+# 👋 I'm Ali Taqi a.k.a TheFlash2k ⚡
 
-A Cyber Security graduate with an avid interest in creating and breaking things. A passionate programmer, hacker, CTF player, producer and a gamer 🎮. 
-
-> A DevSecOps engineer by day, a CTF player by night.
+A Cyber Security graduate with an avid interest in creating and breaking things. A passionate programmer, hacker, CTF player, music producer and a gamer 🎮.
 
 ## Skills
 
 - **Programming Languages**: Python, C, C++, C#, JavaScript, Go, Ruby, Bash, Batch, PowerShell and a little bit of Nim
-- **Tools & Frameworks**: Docker, Ansible, Terraform, Kubernetes, Puppet, Chef, Vagrant, Meson/Ninja/CMAKE, OpenStack, Selenium, Flask
+- **Tools & Frameworks**: Docker, Ansible, Terraform, Kubernetes, Puppet, Chef, Vagrant, Grafana, Prometheus, Meson/Ninja/CMAKE, OpenStack
 - **Platforms**: Linux, Windows, AWS, Azure, GCP, DigitalOcean, Vercel, Cloudflare
 
 ## Experience
 
-- **Junior Devops Engineer** at [Pantheon](http://panth.com/) (2023 - Present) [Remote]
-- **DevSecOps Engineer** at [Horizon Tech Services](https://www.horizon.com.pk/ ) (2021 - Present) [Remote]
+- **Junior Devops Engineer** at [Pantheon](http://panth.com/) (January 2023 - September 2023) [Remote]
+- **DevSecOps Engineer** at [Horizon Tech Services](https://www.horizon.com.pk/) (2021 - Present) [Remote]
 
 ## Education
 
@@ -31,7 +29,8 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 
 ## Certifications
 
-- eLearnSecurity Junior Penetration Tester
+- eLearnSecurity Certified Professional Penetration Tester (eCPPT)
+- eLearnSecurity Junior Penetration Tester (eJPT)
 - Certified Ethical Hacker (Practical) (CEH | P)
 - Cisco Certified Network Associate (CCNA)
 
@@ -47,6 +46,7 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 
 ## Projects
 
+- [**CY243-L**](https://github.com/theflash2k/CY243-L) - All the lab manuals, tasks and their solutions for the course CY243 - Penetration Testing along with a Teacher's manual for Lab Setup will be kept here.
 - [**Raidware**](https://github.com/theflash2k/Raidware) - A Complete Command and Control (C2) Framework capable of generating payloads for all the major operating systems i.e. Windows, Linux and macOS. This was developed as the Final Year Project for my Bachelors degree.
 - [**SillyRAT**](https://github.com/hash3liZer/SillyRAT) - This was developed with [Shameer Kashif](https://shameerkashif.me/) (a dear friend of mine) as a part of our OOP Course Project. It is a cross-platform Remote Access Trojan capable of performing stealth operations and AV Evasion written originally in C++ and ported to Python.
 - [**bRAT**](https://github.com/theflash2k/brat) - A C++ based cross-platform Remote Access Trojan capable of performing stealth operations and AV Evasion. (Deprecated and left out)
@@ -60,6 +60,7 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 - **Red Team Lead** at [Air University Cyber Security Society](https://www.au.edu.pk/pages/Faculties/Computing_AI/Cyber_Security/dept_cyber_security_society.aspx) (2021 - 2023)
 - **President** at [Air University Gaming Society](https://www.instagram.com/auegamingsociety/) (2021-2022)
 - **IT Lead** at [Air University Bits and Bytes Society](https://www.aubitsnbytes.com/) (2021-2022)
+- **Visting Lab Engineer** at [Air University, Islamabad](https://au.edu.pk/) (September 2023 - Present)
 
 ## Reach out to me
 
