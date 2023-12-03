@@ -20,7 +20,7 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 
 ## Experience
 
-- **Application Security Engineer** at [Horizon Tech Services](https://www.horizon.com.pk/) (December 2021 - Present) [Islamabad {Hybrid}]
+- **Application Security Engineer** at [Horizon Tech Services](https://www.horizon.com.pk/) (December 2021 - Present) [Islamabad [Hybrid]]
 - **Junior Devops Engineer** at [Red Fort Technologies](https://redforttech.com/) (August 2022 - October 2023) [Remote]
 - **Network & Systems Security Analyst** at [Arrow Consolidated ](https://arrowconsolidated.com) (January 2021 - January 2022)
 
