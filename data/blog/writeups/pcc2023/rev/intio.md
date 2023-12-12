@@ -8,7 +8,7 @@ summary: Reversing a simple S-BOX based encryption to get the flag from a Window
 
 ## Challenge Description
 
-![intio-chal-desc](/public/static/writeups/pcc23/image-1.png)
+![intio-chal-desc](/static/writeups/pcc23/image-1.png)
 
 ## Solution
 
@@ -16,7 +16,7 @@ This challenge was developed by me for the on-site finals of Pakistan Cyber Secu
 https://medium.com/@hexamine22) did (and his solution was 👌). So, I'll be telling you of 3 different solutions, each with a different difficulty level.
 
 Before moving forward, let's that a look at the provided *hint*:
-![hint](/public/static/writeups/pcc23/image-2.png)
+![hint](/static/writeups/pcc23/image-2.png)
 
 Well, the hint is pretty straightforward, `IOCTL` is used to communicate with the driver from the userland. So, we might have to do some sort of communication
 
@@ -24,11 +24,11 @@ Well, the hint is pretty straightforward, `IOCTL` is used to communicate with th
 
 The normal approach that I follow when reversing drivers (which is not necessarily a good approach but,) is to load the Driver and see the logs using `DebugView`. I used `OSRLoader` to load the driver.
 
-![OSR](/public/static/writeups/pcc23/image-3.png)
+![OSR](/static/writeups/pcc23/image-3.png)
 
 Firstly, we registered the service and then load the service. After loading the service, we can see the logs in the `DebugView`:
 
-![DebugView](/public/static/writeups/pcc23/image-4.png)
+![DebugView](/static/writeups/pcc23/image-4.png)
 
 Now, let's write a simple program to communicate with the driver. The program will send the `IOCTL` code to the driver and the driver will send the flag back to the userland. We will use the code from [here](https://www.ired.team/miscellaneous-reversing-forensics/windows-kernel-internals/sending-commands-from-userland-to-your-kernel-driver-using-ioctl)
 
@@ -43,7 +43,7 @@ We have the IOCTL code, from the hint, however, we will have to reverse the driv
 strings -eb IODriver.sys
 ```
 
-![Alt text](/public/static/writeups/pcc23/image-5.png)
+![Alt text](/static/writeups/pcc23/image-5.png)
 
 So now, we know that the Device name is:
 
@@ -53,7 +53,7 @@ So now, we know that the Device name is:
 
 Another way to identify device name is using `driverquery` command.
 
-![using-driver-query](/public/static/writeups/pcc23/image-6.png)
+![using-driver-query](/static/writeups/pcc23/image-6.png)
 
 Now, since we know both the `IOCTL` code and the `Device Name`, we can modify the ired.team's code:
 
@@ -95,7 +95,7 @@ int main(char argc, char ** argv)
 
 Once we have this, we just compiled it and ran this:
 
-![output](/public/static/writeups/pcc23/image-7.png)
+![output](/static/writeups/pcc23/image-7.png)
 
 > You need to pass the data as arguments.
 
@@ -135,7 +135,7 @@ This would've been fun and not this straightforward, but.. yeah.
 
 Now, this was the second solution, albeit slightly guessy, but yeah. So, the driver used a simple S-BOX based encryption. The S-Box looked something like this when disassembled:
 
-![sbox](/public/static/writeups/pcc23/image-8.png)
+![sbox](/static/writeups/pcc23/image-8.png)
 
 Now, it was a bit-guessy but, every `n` character was shifted with the `(n+1)` character. Looking at the disassembly:
 
@@ -165,7 +165,7 @@ for i in range(0, len(_), 2):
 
 Now, this is the S-BOX. Now, we need to decrypt the flag. However, we have yet to find the flag. Looking deep into the driver, we can find a weird set of hex-encoded bytes:
 
-![flag hex](/public/static/writeups/pcc23/image-9.png)
+![flag hex](/static/writeups/pcc23/image-9.png)
 
 Now, using the above s-box, let's try and decrypt `0xf`, `0x10` and `0x10` which should correspond to `PCC`.
 
@@ -188,7 +188,7 @@ for i in flag:
 print(_flag)
 ```
 
-![Alt text](/public/static/writeups/pcc23/image-10.png)
+![Alt text](/static/writeups/pcc23/image-10.png)
 
 ### Solution 3: *Using Unicorn to emulate* (Purely unintended)
 
