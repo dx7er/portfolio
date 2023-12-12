@@ -8,25 +8,25 @@ summary: Performing FU on a binary to fix it and run it to find the flag
 
 ## Challenge Description
 
-![Alt text](../../../../../public/static/writeups/pcc23/image-18.png)
+![Alt text](/static/writeups/pcc23/image-18.png)
 
 ## Solution
 
 This binary was a per-user binary; meaning each user had a different flag in their binaries. Starting the instance; we're greeted with a simple web-page from where we can download the binary
 
-![download-page](../../../../../public/static/writeups/pcc23/image-19.png)
+![download-page](/static/writeups/pcc23/image-19.png)
 
 Now, this challenge was uploaded as part of the PCC qualifiers but no one was able to solve it. However it was pretty easy. Running the binary:
 
-![Alt text](../../../../../public/static/writeups/pcc23/image-20.png)
+![Alt text](/static/writeups/pcc23/image-20.png)
 
 Well, let's try and look at the strings of the binary:
 
-![strings](../../../../../public/static/writeups/pcc23/image-21.png)
+![strings](/static/writeups/pcc23/image-21.png)
 
 One thing that is weird; everything is rotated, one line looked like it made sense; reversing it:
 
-![gcc](../../../../../public/static/writeups/pcc23/image-22.png)
+![gcc](/static/writeups/pcc23/image-22.png)
 
 Well, it matches `GCC`, but `HCD`. Oh, It looks like each byte is shifted-by-1 and the entire binary is currently reversed. Let's firstly un-reverse the binary and then look at the bytes to actually confirm our theory.
 
@@ -42,11 +42,11 @@ with open('final', 'wb') as f:
     f.write(_in)
 ```
 
-![Alt text](../../../../../public/static/writeups/pcc23/image-23.png)
+![Alt text](/static/writeups/pcc23/image-23.png)
 
 Now, let's look the binary's bytes:
 
-![Alt text](../../../../../public/static/writeups/pcc23/image-24.png)
+![Alt text](/static/writeups/pcc23/image-24.png)
 
 Well, this confirmed our theory, every even byte is shifted by-1, so let's write a simple script to fix the binary:
 
@@ -68,6 +68,6 @@ with open('final', 'wb') as f:
 
 After running the script and running `file` on file:
 
-![Alt text](../../../../../public/static/writeups/pcc23/image-25.png)
+![Alt text](/static/writeups/pcc23/image-25.png)
 
 Overall, I know it was a bit of a guessy challenge, but ;-;. I hope you enjoyed the writeup.
