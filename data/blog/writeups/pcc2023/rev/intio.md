@@ -243,6 +243,8 @@ flag = mu.mem_read(rsp+0x70-0x58+0x18, 48)
 print(flag)
 ```
 
+> I added a hook to start decryption from the beginning of the encrypted data because for some reason it was starting decryption from the middle of the encrypted data. I nopped out all the WinAPI calls and push instructions at the start of the decrypt function so I wouldn't have to add more hooks to deal with them. I also dumped the loaded file from IDA so I won't have to worry about offsets. ~ 72Ghoul
+
 What this code does, is that the `decrypt` function is at a constant offset, he patched the driver to jump to the `decrypt` function. Then, he emulated the driver using unicorn.
 
 Nevertheless, this solution caught me off-guard and I was really impressed by it. So, I decided to include it in the writeup. Great job, do check out his [blog](https://medium.com/@hexamine22) as he's one of the best reversers I know.
