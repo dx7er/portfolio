@@ -8,7 +8,7 @@ summary: Utilizing Heap Use-After-Free to load the flag into user-controlled chu
 
 ## Challenge Description
 
-![challenge_desc](/public/static/writeups/pucon24/image.png)
+![challenge_desc](/static/writeups/pucon24/image.png)
 
 ## Solution
 
@@ -20,12 +20,12 @@ In this challenge, we were given a simple `champ_cat` binary and a `tcache.c` (w
 
 Let's first start out by checking the security mitigations on this binary:
 
-![alt text](/public/static/writeups/pucon24/image-1.png)
+![alt text](/static/writeups/pucon24/image-1.png)
 
 Well, all the mitigations are enabled. Loading this binary up in a disassembler, we're greeted with the following functions:
 
-![alt text](/public/static/writeups/pucon24/image-2.png)
-![alt text](/public/static/writeups/pucon24/image-3.png)
+![alt text](/static/writeups/pucon24/image-2.png)
+![alt text](/static/writeups/pucon24/image-3.png)
 
 Well, those are quite a lot of functions, let's start by analyzing `main`:
 
@@ -357,38 +357,38 @@ io.interactive()
 
 Now, let's attach gdb to this and check the `bins` and the heap:
 
-![alt text](/public/static/writeups/pucon24/image-4.png)
-![alt text](/public/static/writeups/pucon24/image-6.png)
+![alt text](/static/writeups/pucon24/image-4.png)
+![alt text](/static/writeups/pucon24/image-6.png)
 
 Now, we can see that the `/dev/urandom`'s random data is stored on the heap and since we closed the file, this specific chunk now lies in the tcache. However, the first few bytes of this chunk's data section are NULLED out:
 
-![alt text](/public/static/writeups/pucon24/image-5.png)
+![alt text](/static/writeups/pucon24/image-5.png)
 
 However, let's still try and load the flag:
 
-![alt text](/public/static/writeups/pucon24/image-7.png)
+![alt text](/static/writeups/pucon24/image-7.png)
 
 > NOTE: We get a `Operation not permitted` due to the `setuid(0)` function call, but the flag is still read.
 
 We can see, that the address that flag is stored on corresponds to the address of the free'd filelist slot 0 summary chunk. Analyzing the heap now:
 
-![alt text](/public/static/writeups/pucon24/image-8.png)
+![alt text](/static/writeups/pucon24/image-8.png)
 
 Our flag, resides on the heap now. But, before moving forward and trying to read this, let's firstly see the `filelist` in memory:
 
-![alt text](/public/static/writeups/pucon24/image-9.png)
+![alt text](/static/writeups/pucon24/image-9.png)
 
 Now, for the index 0, the offset would be `base+0`:
 
-![alt text](/public/static/writeups/pucon24/image-10.png)
+![alt text](/static/writeups/pucon24/image-10.png)
 
 Taking a closer look, we can see that only the first byte contains the `fd` of the file that was opened. No other data is stored. So, our try to read the flag would fail because the address where the pointer to the chunk where the summary would be stored is nulled out. If we try and print the file list now:
 
-![alt text](/public/static/writeups/pucon24/image-11.png)
+![alt text](/static/writeups/pucon24/image-11.png)
 
 We get a bunch of nulls. So, that was a fail. There are other functions, let's try those and see. Looking at the menu, we see some functions that have the word `curse` in them:
 
-![alt text](/public/static/writeups/pucon24/image-12.png)
+![alt text](/static/writeups/pucon24/image-12.png)
 
 Let's start by taking a look at the `Allocate the curse buffer`. The decompilation of that function is:
 
@@ -498,7 +498,7 @@ free_buffer()
 
 Let's check the state of the heap:
 
-![alt text](/public/static/writeups/pucon24/image-14.png)
+![alt text](/static/writeups/pucon24/image-14.png)
 
 Now, we can see that the chunk we allocated, ended up in the `tcache bin` after it was freed.
 
@@ -510,11 +510,11 @@ open_file(0, "/dev/urandom", 0x100)
 
 Checking the heap state:
 
-![alt text](/public/static/writeups/pucon24/image-15.png)
+![alt text](/static/writeups/pucon24/image-15.png)
 
 Now, our free'd chunk was allocated for the `summary` and also, stored on the `filelist`. Let's check the filelist:
 
-![alt text](/public/static/writeups/pucon24/image-16.png)
+![alt text](/static/writeups/pucon24/image-16.png)
 
 We can see that `filelist+0x1008`, now points to the chunk that we allocated. Now, let's free this chunk:
 
@@ -522,11 +522,11 @@ We can see that `filelist+0x1008`, now points to the chunk that we allocated. No
 free_buffer()
 ```
 
-![alt text](/public/static/writeups/pucon24/image-17.png)
+![alt text](/static/writeups/pucon24/image-17.png)
 
 The chunk once again ended up inside the `tcache bin`. Let's analyze the `filelist` and see if the summary buffer still points to a valid address:
 
-![alt text](/public/static/writeups/pucon24/image-18.png)
+![alt text](/static/writeups/pucon24/image-18.png)
 
 The `filelist` points directly to the chunk that we just freed.
 
@@ -534,11 +534,11 @@ The `filelist` points directly to the chunk that we just freed.
 
 Let's read the flag file and check the state of the heap:
 
-![alt text](/public/static/writeups/pucon24/image-19.png)
+![alt text](/static/writeups/pucon24/image-19.png)
 
 Now, our flag was written in the same buffer that we had just free'd. Let's see if the same address resides in `filelist+0x1008`
 
-![alt text](/public/static/writeups/pucon24/image-20.png)
+![alt text](/static/writeups/pucon24/image-20.png)
 
 Perfect. The last thing that we need to is:
 
@@ -546,11 +546,11 @@ Perfect. The last thing that we need to is:
 
 For that, we already have two functions, `print_list` and `print_file`. Let's invoke the `print_file` function for a more cleaner output:
 
-![alt text](/public/static/writeups/pucon24/image-21.png)
+![alt text](/static/writeups/pucon24/image-21.png)
 
 Now, the `readv` syscall is giving an error about `invalid argument`, so we'll make use of the `print_list` function:
 
-![alt text](/public/static/writeups/pucon24/image-22.png)
+![alt text](/static/writeups/pucon24/image-22.png)
 
 Well, this worked like a charm. Let's further clear out the input and the final exploit becomes (removing all unnecessary functions):
 
@@ -603,11 +603,11 @@ read_flag()
 print_list()
 ```
 
-![alt text](/public/static/writeups/pucon24/image-23.png)
+![alt text](/static/writeups/pucon24/image-23.png)
 
 Now, let's run this on the remote:
 
-![alt text](/public/static/writeups/pucon24/image-24.png)
+![alt text](/static/writeups/pucon24/image-24.png)
 
 Overall, a very good challenge and helped me brush up my skills on linux heap exploitation.
 
