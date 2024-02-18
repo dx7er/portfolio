@@ -1,14 +1,14 @@
 ---
 title: PUCon' 24 - Userspace - Palate
 date: '2024-2-17'
-tags: ['ctf', 'pwn', 'pie-bypass', 'printf-leak', 'ret2win']
+tags: ['pucon', 'userspace', 'ctf', 'pwn', 'pie-bypass', 'printf-leak', 'ret2win']
 draft: false
 summary: Utilizing Format String Vulnerability to leak the address of PIE and then a simple Ret2Win with args.
 ---
 
 ## Challenge Description
 
-![alt text](../../../../../public/static/writeups/pucon24/image-25.png)
+![alt text](/static/writeups/pucon24/image-25.png)
 
 ## Solution
 
@@ -91,11 +91,11 @@ io.interactive()
 
 Now, on running this exploit:
 
-![alt text](../../../../../public/static/writeups/pucon24/image-26.png)
+![alt text](/static/writeups/pucon24/image-26.png)
 
 We passed in `30`, but the stdout only printed `uptil` 12. Let's attach GDB, and see what exactly is memory mapping as we need a `PIE` leak.
 
-![alt text](../../../../../public/static/writeups/pucon24/image-27.png)
+![alt text](/static/writeups/pucon24/image-27.png)
 
 Now, what we need is a leak that corresponds to PIE, i.e. `0x56xxxxxxxx`, so. Let's change the function call:
 
@@ -104,7 +104,7 @@ Now, what we need is a leak that corresponds to PIE, i.e. `0x56xxxxxxxx`, so. Le
 + fmt = create_fmt(13, 22, with_index=True)
 ```
 
-![alt text](../../../../../public/static/writeups/pucon24/image-28.png)
+![alt text](/static/writeups/pucon24/image-28.png)
 
 Let's increase this:
 
@@ -113,11 +113,11 @@ Let's increase this:
 + fmt = create_fmt(23, 30, with_index=True)
 ```
 
-![alt text](../../../../../public/static/writeups/pucon24/image-29.png)
+![alt text](/static/writeups/pucon24/image-29.png)
 
 Now, looking at these addresses, we can see that, the address at `27th` position corresponds to what looks like `PIE` leak. Let's see this address in GDB.
 
-![alt text](../../../../../public/static/writeups/pucon24/image-30.png)
+![alt text](/static/writeups/pucon24/image-30.png)
 
 This address corresponds to the beginning of the main function.
 
@@ -138,7 +138,7 @@ io.interactive()
 
 Well, we've done this thousands of time, so, i'll just skim through this, pass random data to the first input, send cyclic pattern to the second input and check the offset:
 
-![alt text](../../../../../public/static/writeups/pucon24/image-31.png)
+![alt text](/static/writeups/pucon24/image-31.png)
 
 The offset came out to be `104`. So, let's note it down.
 
@@ -160,7 +160,7 @@ io.sendlineafter(b"time\n", payload)
 
 Running this, I got the shell.
 
-![alt text](../../../../../public/static/writeups/pucon24/image-33.png)
+![alt text](/static/writeups/pucon24/image-33.png)
 
 Final exploit that I used was:
 
@@ -198,5 +198,5 @@ io.interactive()
 
 Running this exploit against remote:
 
-![alt text](../../../../../public/static/writeups/pucon24/image-34.png)
+![alt text](/static/writeups/pucon24/image-34.png)
 

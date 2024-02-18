@@ -1,7 +1,7 @@
 ---
 title: PUCon' 24 - Userspace - Champcat
 date: '2024-2-17'
-tags: ['ctf', 'pwn', 'heap', 'uaf', 'chunk-reuse']
+tags: ['pucon', 'userspace', 'ctf', 'pwn', 'heap', 'uaf', 'chunk-reuse']
 draft: false
 summary: Utilizing Heap Use-After-Free to load the flag into user-controlled chunk and read it.
 ---
