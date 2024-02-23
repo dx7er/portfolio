@@ -104,7 +104,7 @@ make nonx
 
 ## Remote Deployment
 
-When developing challenges for [Pakistan Cyber Security Challenge](https://github.com/AirOverflow/PCC-23-Challs), I made a simple and easy to use Docker Image, and I fixed a few bugs that I found in the image. You can find it on [Github](https://github.com/TheFlash2k/my-containers/tree/main/pwn-chal) or on [Dockerhub](https://hub.docker.com/repository/docker/theflash2k/pwn-chal/)
+When developing challenges for [Pakistan Cyber Security Challenge](https://github.com/AirOverflow/PCC-23-Challs), I made a simple and easy to use Docker Image, and I fixed a few bugs that I found in the image. You can find it on [Github](https://github.com/TheFlash2k/my-containers/tree/main/pwn-chal) or on [Dockerhub](https://hub.docker.com/r/theflash2k/pwn-chal)
 
 Now, in order to deploy this challenge, we can use `theflash2k/pwn-chal:latest`. For C++ binaries, I made a seperate image with a `cpp` tag i.e. `theflash2k/pwn-chal:cpp` and similarly the python one is (python 3.8 and ubuntu 20.04) `theflash2k/pwn-chal:python`. All three images follow the same syntax and same set of environment variables are required to setup the image.
 
