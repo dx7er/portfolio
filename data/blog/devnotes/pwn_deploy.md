@@ -8,7 +8,7 @@ summary: Creating a pwn challenge from scratch, and deploying it remotely using 
 
 # Introduction
 
-This blog post will cover all the basics on how you can develop pwn challenges, what issues you might and how to overcome those issues and how to deploy the challenges that will listen on port and allow remote connections.
+This blog post will cover all the basics on how you can develop pwn challenges and how to deploy them using docker so that they will listen on port and allow remote connections.
 
 Same concept can be used to deploy any python (crypto/misc/jail escapes) challenges to remote.
 
@@ -41,7 +41,9 @@ int main(int argc, char* argv) {
 }
 ```
 
-Now, consider this source code. I won't go through where the vulnerability exists, and how we can exploit it. However, the one function called `setup` is pretty important. What this will do, is allow for buffering, so when this binary is hosted to receive connection through a socket, it's IO will be unbuffered and will allow for `stdin`, `stdout` and `stderr` to be served over a socket. And alarm will automatically send `SIGALARM` to the binary after `n` seconds, i.e. in our case `0x10` seconds.
+Now, consider this source code. I won't go through where the vulnerability exists, and how we can exploit it. However, the one function called `__constructor__` is pretty important. What this will do, is allow for buffering, so when this binary is hosted to receive connection through a socket, it's IO will be unbuffered and will allow for `stdin`, `stdout` and `stderr` to be served over a socket. And alarm will automatically send `SIGALARM` to the binary after `n` seconds, i.e. in our case `0x10` seconds.
+
+For every pwn chal to you create, make sure to just copy paste this `__constructor__` function, or set buffering.
 
 The following table contains all the information we need to know about the `gcc` flags for pwn:
 
@@ -150,5 +152,3 @@ Now, the final folder structure that I maintain looks something like this:
 ```
 
 I'm currently working on ARM challenges and will update this blog accordingly. However, for Kernel-based challenges' development & deployment, you can look up [Papadoxie](https://papadoxie.github.io/Blog/Making%20a%20Kernel%20CTF%20%28PUCon%2724%20pwn%20CTF%29/)'s guide. He has explained quite a lot of stuff.
-
----
