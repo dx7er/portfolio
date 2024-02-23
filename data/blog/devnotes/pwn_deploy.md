@@ -41,9 +41,9 @@ int main(int argc, char* argv) {
 }
 ```
 
-Now, consider this source code. I won't go through where the vulnerability exists, and how we can exploit it. However, the one function called `__constructor__` is pretty important. What this will do, is allow for buffering, so when this binary is hosted to receive connection through a socket, it's IO will be unbuffered and will allow for `stdin`, `stdout` and `stderr` to be served over a socket. And alarm will automatically send `SIGALARM` to the binary after `n` seconds, i.e. in our case `0x10` seconds.
+I won't go through where the vulnerability exists, and how we can exploit it, however, the one function called `__constructor__` is pretty important. What this will do, is set buffering, so when this binary is hosted to receive connection through a socket, it's IO will be unbuffered and will allow for `stdin`, `stdout` and `stderr` to be served over a socket. And alarm will automatically send `SIGALARM` to the binary after `n` seconds, i.e. in our case `0x10` seconds.
 
-For every pwn chal to you create, make sure to just copy paste this `__constructor__` function, or set buffering.
+For every pwn chal that you create, make sure to just copy paste this `__constructor__` function, or set buffering.
 
 The following table contains all the information we need to know about the `gcc` flags for pwn:
 
