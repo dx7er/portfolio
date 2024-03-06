@@ -10,6 +10,14 @@ summary: A detailed guide on how printf's can be used for arbitrary read and arb
 
 In this guide, I'll go towards intricate details of Format String Bugs, how they occur, how they work and how they can be exploited to read values from the stack, write values to an arbitrary location and get a shell. This blog post will go in-depth to make sure that we fully understand each concept as we go through them.
 
+## Table of Contents:
+
+1. [What is a Format String and Printf](#what-is-a-format-string-and-printf)
+    a. [Specifier](#specifiers)
+        i. [Length sub-specifier](#length-sub-specifier)
+        ii. [Position sub-specifier](#position-sub-specifier)
+    b. [Printf](#printf)
+
 ---
 
 ## What is a Format String and Printf?
@@ -79,3 +87,6 @@ According to [`cplusplus.com`](https://cplusplus.com/reference/cstdio/printf/):
 > Writes the C string pointed by format to the standard output (stdout). If format includes format specifiers (subsequences beginning with %), the additional arguments following format are formatted and inserted in the resulting string replacing their respective specifiers.
 
 In simpler terms, `printf` is a function that takes in a [`format specifier`](#specifiers), parses it and displays it to `stdout`.
+
+> Fun-Fact: When printf doesn't have any format specifier, compilers such as `gcc` and `clang` often compile `printf` to `puts` for performance enhancment.
+
