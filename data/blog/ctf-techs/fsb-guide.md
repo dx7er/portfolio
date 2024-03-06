@@ -53,3 +53,29 @@ The length sub-specifier modifies the length of the data type.
 | length sub-specifier | d,i | u,o,x,X | f,F,e,E,g,G,a,A | c | s | p | n |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | (none) | int | unsigned int | double | int | char* | void* | int* |
+| hh | signed char (one-byte) | unsigned char | - | - | - | - | signed char* |
+| h | short int (2-bytes) | unsigned short int | - | - | - | - | short int* |
+| l | long int (8-bytes) | unsigned long int | - | wint_t | wchar_t* | - | long int* |
+| ll | long long int (8-bytes) | unsigned long long int | - | - | - | - | long long int* |
+
+> NOTE: There are other sub-specifiers, but we'll focus on only these.
+
+#### Position sub-specifier
+
+There's also one sub-specifier (per-se) that allows an exact position offset value (from `RSP`.). The usage of that is as follows:
+
+```c
+%{POSITION}${SPECIFIER}
+
+// Example:
+// %10$p
+// This will print the 10th value as a pointer address from the RSP.
+```
+
+### Printf
+
+According to [`cplusplus.com`](https://cplusplus.com/reference/cstdio/printf/):
+
+> Writes the C string pointed by format to the standard output (stdout). If format includes format specifiers (subsequences beginning with %), the additional arguments following format are formatted and inserted in the resulting string replacing their respective specifiers.
+
+In simpler terms, `printf` is a function that takes in a [`format specifier`](#specifiers), parses it and displays it to `stdout`.
