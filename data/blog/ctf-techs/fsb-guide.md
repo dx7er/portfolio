@@ -24,7 +24,7 @@ A format specifier must follow the following syntax (Reference: [cplusplus.com](
 %[flags][width][.precision][length]specifer
 ```
 
-### specifiers
+### Specifiers
 
 For each of the data type in C/C++, there exists a specifier that needs to passed for the value that is to be displayed. There exist the following the specifiers:
 
@@ -44,6 +44,12 @@ For each of the data type in C/C++, there exists a specifier that needs to passe
 | n | **Important:** This doesn't really print anything, but argument to this must be a pointer to a signed int. This will write the number of characters written so for the pointed location. |
 | % | A % followed by another % character will write a single % to the stream |
 
-The format specifier can also contain sub-specifiers: flags, width, .precision and modifiers (in that order), which are optional and follow these specifications:
+The format specifier can also contain sub-specifiers: flags, width, .precision and length modifiers (in that order), which are optional and follow these specifications. For our exploitation purposes, the only thing that is worth noting is the `length` modifier. However, it is recommended that we understand the inner workings, for that, I highly recommend that you go and read [this](https://cplusplus.com/reference/cstdio/printf/).
 
-| 
+#### Length sub-specifier
+
+The length sub-specifier modifies the length of the data type.
+
+| length sub-specifier | d,i | u,o,x,X | f,F,e,E,g,G,a,A | c | s | p | n |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| (none) | int | unsigned int | double | int | char* | void* | int* |
