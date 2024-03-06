@@ -1,6 +1,6 @@
 ---
 title: A Definitive Guide to Format String Bug
-date: '2024-02-29'
+date: '2024-03-06'
 tags: ['ctf-techs', 'fsb', 'format-string', 'printf', 'pwn', 'guides']
 draft: false
 summary: A detailed guide on how printf's can be used for arbitrary read and arbitrary write.
