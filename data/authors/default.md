@@ -35,6 +35,9 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 
 ## Achievements
 
+- **1st Place** in NasCon'24 organized by FAST University, on-site in Islamabad (2024)
+- **2nd Place** in PuCon'24 organized by Punjab University, online (2023)
+- **1st Place** in Digital Pakistan Cyber Security Hackathon organized by MoITT and IGNITE, on-site in Islamabad (2023)
 - **1st Place** in [AUPCTF'23](https://ctftime.org/event/2025) organized by University of Peshawar, online (2023)
 - **2nd Place** in PuCon'23 organized by Punjab University, online (2023)
 - **1st Place** in NasCon'23 organized by FAST University, on-site in Islamabad (2023)
