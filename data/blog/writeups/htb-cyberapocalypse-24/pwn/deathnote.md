@@ -203,7 +203,7 @@ The exploitation path is pretty simple, we can do the following:
 
 - Fill tcache by allocating memory
 - Allocate a chunk of the same size and then free it so it goes to the unsorted bin
-- The chunk in the unsorted bin will contain a libc address, so we have a leak
+- The chunk in the unsorted bin will contain a libc's arena address, so we have a leak
 - Write system to chunk 0, `/bin/sh` to chunk 1
 - Invoke `42` and win.
 
@@ -241,7 +241,7 @@ What this will do; is allocate `10` elements, and then free `0x7` of those, so t
 
 ![alt text](/static/writeups/htb-cyberapocalypse/image-6.png)
 
-Now we'll free `chunk 7`, and when we show that chunk, we'll see that we have a leak of libc:
+Now we'll free `chunk 7`, and when we show that chunk, we'll see that we have a leak of libc's arena:
 
 ![alt text](/static/writeups/htb-cyberapocalypse/image-7.png)
 
