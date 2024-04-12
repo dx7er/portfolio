@@ -8,7 +8,7 @@ const siteMetadata = {
   //siteUrl: 'https://theflashk2k.me',
   siteRepo: 'https://github.com/dx7er/portfolio',
   siteLogo: '/static/images/dp_logo.jpeg',
-  image: '/static/images/phlesh.png',
+  image: '/static/images/dp_logo.jpeg',
   socialBanner: '/static/images/twitter-card.png',
   email: 'dx73r@protonmail.com',
   github: 'https://github.com/dx7er',
