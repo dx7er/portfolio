@@ -50,6 +50,18 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 - **Red Team Lead** at [Air University Cyber Security Society](https://www.au.edu.pk/pages/Faculties/Computing_AI/Cyber_Security/dept_cyber_security_society.aspx) (2022 - 2023)
 - **Coding Team Lead** at [Air University Cyber Security Society](https://www.au.edu.pk/pages/Faculties/Computing_AI/Cyber_Security/dept_cyber_security_society.aspx) (2021 - 2022)
 
+## My Services
+
+- OSINT Investigation ( HUMINT / GEOINT / SIGINT / TECHINT / FININT / SOCMINT )
+- Penetration Testing ( Website / WebApp / Network / System )
+- Python / C / C++ / Bash Scripting
+- Deep / DarkWeb Investigation
+- Red Team Operations
+- AI and ML Application Development
+- Information Security Certification Preperation
+- Ethical Hacking and Cybersecurity Servives
+- Online Pentest / CTF and Training Sessions
+
 ## Reach out to me
 
 - Discord: `dx7er`
