@@ -10,7 +10,7 @@ github: https://github.com/dx7er
 
 # 👋 I'm Saqlain Naqvi a.k.a Dexter 
 
-A Cyber Security graduate with an avid interest in creating and breaking things. A red team enthusiast and a gamer 🎮.
+A Cyber Security graduate with an avid interest in creating and breaking things. A red team enthusiast 👾 and a gamer 🎮.
 
 ## Skills
 
