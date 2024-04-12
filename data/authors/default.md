@@ -8,9 +8,9 @@ linkedin: https://www.linkedin.com/in/naqvio7
 github: https://github.com/dx7er
 ---
 
-# 👋 I'm Saqlain Naqvi a.k.a Dexter 
+# 👋 I'm Saqlain Naqvi
 
-A Cyber Security graduate with an avid interest in creating and breaking things. A red team enthusiast 👾 and a gamer 🎮.
+A Cyber Security graduate with an avid interest in creating and breaking things. A Red Team Enthusiast「👾」and a Gamer「🎮」.  
 
 ## Skills
 
