@@ -52,11 +52,11 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 
 ## My Services
 
-- OSINT Investigation ( HUMINT / GEOINT / SIGINT / TECHINT / FININT / SOCMINT )
-- Penetration Testing ( Website / WebApp / Network / System )
-- Python / C / C++ / Bash Scripting
-- Deep / DarkWeb Investigation
+- OSINT Investigation Services
+- Penetration Testing Services
 - Red Team Operations
+- Deep / DarkWeb Investigation
+- Python / C / C++ / Bash Scripting
 - AI and ML Application Development
 - Information Security Certification Preperation
 - Ethical Hacking and Cybersecurity Servives
@@ -64,7 +64,7 @@ A Cyber Security graduate with an avid interest in creating and breaking things.
 
 ## Reach out to me
 
-- Discord: `dx7er`
+- Discord: `dx7er` OR `naqviO7#9735`
 - Email: `dx73r@protonmail.com`
-- LinkedIn: [saqlain-naqvi](https://www.linkedin.com/in/naqvio7/)
+- LinkedIn: [Saqlain Naqvi](https://www.linkedin.com/in/naqvio7/)
 - GitHub: [dx7er](https://github.com/dx7er)
