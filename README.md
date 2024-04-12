@@ -1,4 +1,4 @@
-# TheFlash2k Portfolio.
+# dx73r Portfolio.
 
 First of all, shoutout to [Timothy](https://github.com/timlrx) for this amazing [theme](https://github.com/timlrx/tailwind-nextjs-starter-blog).
 
