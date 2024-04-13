@@ -1,7 +1,7 @@
 ---
 title: eJPTv2 Exam Review
 date: '2024-03-01'
-tags: ['ejpt', 'exam', 'aupctf', 'pentesting', 'certification', 'hacking', 'INE', 'elearn', 'eJPTv2']
+tags: ['ejpt', 'exam', 'pentesting', 'certification', 'hacking', 'INE', 'elearn', 'eJPTv2']
 draft: false
 summary: My thoughts on INE Elearn Security eJPTv2 Certification.
 ---
