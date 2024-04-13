@@ -29,7 +29,7 @@ Following are the different types of questions that you can expect to see on the
 
 ## Some Tips.
 
-- **Study for at least 6 months.** The eJPTv2 exam covers a lot of material, so it’s important to give yourself plenty of time to study. I used a combination of INE training, practice labs, and TryHackMe to prepare for exams.
+- **Study for at least 2 months.** The eJPTv2 exam covers a lot of material, so it’s important to give yourself plenty of time to study. I used a combination of INE training, practice labs, and TryHackMe to prepare for exams.
 - **Get hands-on experience.** In addition to studying, it’s also important to get hands-on experience with cybersecurity tools and techniques. I did this by doing practice on TryHackMe and INE practice labs and black boxes.
 - **Don’t be afraid to ask for help.** If you’re struggling with a particular topic, don’t be afraid to ask for help from a friend, family member, or online forum. There are many people who are willing to help you succeed.
 
