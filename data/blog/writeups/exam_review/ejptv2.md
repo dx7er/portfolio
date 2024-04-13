@@ -1,3 +1,13 @@
+---
+title: eJPTv2 Exam Review
+date: '2024-03-01'
+tags: ['ejpt', 'exam', 'aupctf', 'pentesting', 'certification', 'hacking', 'INE', 'elearn', 'eJPTv2']
+draft: false
+summary: My thoughts on INE Elearn Security eJPTv2 Certification.
+---
+
+
+
 I recently passed the eJPTv2 exam, and I wanted to share my experience with you. The eJPTv2 is an entry-level penetration testing certification offered by eLearnSecurity. It covers a wide range of topics, including reconnaissance, enumeration, exploitation, and post-exploitation. The exam is challenging, but it’s also a great way to learn the fundamentals of penetration testing.
 
 The PTS course material includes networking basics, basics about how web applications work, BurpSuite, an introduction to programming with Python, Bash scripting, and penetration testing basics (information gathering, footprinting and scanning, enumeration, vulnerability assessments, web attacks, system attacks, and network attacks).
