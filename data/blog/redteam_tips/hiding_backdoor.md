@@ -19,9 +19,7 @@ Scheduled tasks in Windows allow you to automate the execution of programs or sc
 - **Randomized Execution Times:** Scheduled tasks can be set to execute at random or uncommon times to evade detection. By avoiding predictable patterns, the backdoor can operate stealthily without raising suspicion.
 - **Dynamic Payload:** The scheduled task can be configured to download or update the backdoor's payload from an external server at regular intervals, making it harder to detect as the payload itself may change frequently.
 - **Low Priority:** Assigning the scheduled task a low priority can ensure that it operates in the background without interfering with the normal operation of the system, further reducing the likelihood of detection.
-- **Encoded or Encrypted Commands:** Backdoor commands executed through scheduled tasks can be encoded or encrypted to obfuscate their purpose and make it more difficult for security tools to detect malicious activity.
 - **Conditional Execution:** The backdoor can be programmed to execute only under specific conditions, such as when certain files or processes are present on the system, to avoid detection by antivirus or other security software that relies on signatures or behavior analysis.
-- **Rootkit-like Behavior:** In more sophisticated attacks, scheduled tasks could be used as part of a broader strategy to deploy a rootkit, which is a set of tools and techniques used to maintain unauthorized access to a system while evading detection by traditional security measures.
 
 ### Evasion Technique.
 >The SD `Security Descriptor`, essentially an Access Control List (ACL), dictates which users can access the scheduled task. By removing this descriptor, we effectively render the task invisible to all users, including administrators. Windows only displays tasks that users have permission to use, so restricting access conceals our activity.
