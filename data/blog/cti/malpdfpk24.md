@@ -15,7 +15,7 @@ Recently, the Prime Minister’s office in Pakistan was targeted by a cyberattac
 
 ### Analyzing Suspicious PDF Files
 
-Analyzing a suspicious PDF file involves examining, decoding, and extracting the contents of suspicious PDF objects that may be used to exploit a vulnerability. There are several web-based tools available for analyzing suspicious PDFs without having to install any tools. These online tools automate the scanning of PDF files to identify malicious components4.
+Analyzing a suspicious PDF file involves examining, decoding, and extracting the contents of suspicious PDF objects that may be used to exploit a vulnerability. There are several web-based tools available for analyzing suspicious PDFs without having to install any tools. These online tools automate the scanning of PDF files to identify malicious components.
 
 **Some of these tools include:**
 
