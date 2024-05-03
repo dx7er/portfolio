@@ -30,9 +30,9 @@ The [DocGuard](https://app.docguard.io/23f3a046884bf94ec706f98000a9efbda48455b4d
 
 1. **General Information**
    
-- **File Name:** Outstanding Payment of Tender upload fee - PPRA.pdf</br>
-- **SHA256:** 23f3a046884bf94ec706f98000a9efbda48455b4dd86f0665409937b1fb811cb</br>
-- **MD5:** d4eb4cee8aeb6f2ea36afadeda9dbb23</br>
+- **File Name:** Outstanding Payment of Tender upload fee - PPRA.pdf
+- **SHA256:** 23f3a046884bf94ec706f98000a9efbda48455b4dd86f0665409937b1fb811cb
+- **MD5:** d4eb4cee8aeb6f2ea36afadeda9dbb23
 
 2. **Detections**
 
