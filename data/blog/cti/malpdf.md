@@ -49,9 +49,14 @@ These are the Maldoc types and detected ones:</br>
 - (MD5) 38f96b882363cb659d4cabec49bf605c
 
 4. **File Content:**</br>
-
+![image](https://github.com/dx7er/portfolio/assets/79792270/06bc1169-b9ea-4c58-8a40-ba6828382359)
+![image](https://github.com/dx7er/portfolio/assets/79792270/83e4572d-fce9-495a-b0cc-8bf0037fa7e8)
+![image](https://github.com/dx7er/portfolio/assets/79792270/c7da13b5-58f4-42b2-a931-016b36a15180)
+![image](https://github.com/dx7er/portfolio/assets/79792270/dc61ed0a-7d9f-4d31-a60e-a30635de3325)
 
 
 ### The Threat Landscape
 The incident at the Prime Minister’s office is a stark reminder of the evolving threat landscape. Cybercriminals are constantly developing new techniques to evade detection and carry out their malicious activities. In this case, the suspicious PDF file was able to bypass all AV systems, highlighting the need for robust and comprehensive cybersecurity measures.
 
+### Conclusion
+In conclusion, the blog post highlights the importance of vigilant cybersecurity practices in the face of increasingly sophisticated cyber threats. The incident involving a phishing PDF file that targeted the Prime Minister’s Office of Pakistan and evaded all antivirus systems underscores the need for advanced threat detection and analysis tools. The incident serves as a reminder that no entity, regardless of its stature, is immune to cyberattacks. Therefore, continuous vigilance, regular system checks, and the use of advanced threat detection tools are crucial in maintaining a robust defense against such threats.
