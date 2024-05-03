@@ -48,12 +48,6 @@ These are the Maldoc types and detected ones:</br>
 - http[:]//docs.mofa-services-server.top/
 - (MD5) 38f96b882363cb659d4cabec49bf605c
 
-4. **File Content:**</br>
-![image](./data/blog/cti/malpdfpk24/ppdf1.jpeg)
-![image](https://github.com/dx7er/portfolio/assets/79792270/83e4572d-fce9-495a-b0cc-8bf0037fa7e8)
-![image](https://github.com/dx7er/portfolio/assets/79792270/c7da13b5-58f4-42b2-a931-016b36a15180)
-![image](https://github.com/dx7er/portfolio/assets/79792270/dc61ed0a-7d9f-4d31-a60e-a30635de3325)
-
 
 ### The Threat Landscape
 The incident at the Prime Minister’s office is a stark reminder of the evolving threat landscape. Cybercriminals are constantly developing new techniques to evade detection and carry out their malicious activities. In this case, the suspicious PDF file was able to bypass all AV systems, highlighting the need for robust and comprehensive cybersecurity measures.
