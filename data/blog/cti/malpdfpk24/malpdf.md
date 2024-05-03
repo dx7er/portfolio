@@ -49,7 +49,7 @@ These are the Maldoc types and detected ones:</br>
 - (MD5) 38f96b882363cb659d4cabec49bf605c
 
 4. **File Content:**</br>
-![image](https://github.com/dx7er/portfolio/assets/79792270/06bc1169-b9ea-4c58-8a40-ba6828382359)
+![image](./data/blog/cti/malpdfpk24/ppdf1.jpeg)
 ![image](https://github.com/dx7er/portfolio/assets/79792270/83e4572d-fce9-495a-b0cc-8bf0037fa7e8)
 ![image](https://github.com/dx7er/portfolio/assets/79792270/c7da13b5-58f4-42b2-a931-016b36a15180)
 ![image](https://github.com/dx7er/portfolio/assets/79792270/dc61ed0a-7d9f-4d31-a60e-a30635de3325)
