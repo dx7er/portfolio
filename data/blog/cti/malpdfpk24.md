@@ -47,7 +47,7 @@ These are the Maldoc types and detected ones:
   |Suspicious Encryption | Not Detected |
 
 >For more details [visit](https://app.docguard.io/23f3a046884bf94ec706f98000a9efbda48455b4dd86f0665409937b1fb811cb/112148fa-67fb-4646-8dcd-9007ddf87e00/0/results/dashboard)
->For indepth analysis [visit](https://www.virustotal.com/gui/file/8a6e381ab6f1d2ab74e3ee232680d5991c9f751241a6a0c3f0d9082d2cf61a05/relations) 
+> and for indepth analysis [visit](https://www.virustotal.com/gui/file/8a6e381ab6f1d2ab74e3ee232680d5991c9f751241a6a0c3f0d9082d2cf61a05/relations) 
 
 3. **IOC**
    
