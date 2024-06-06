@@ -33,3 +33,16 @@ Following are types of Social Engineering
 5. **Hoenytrap:** A honeytrap attack is a social engineering technique that specifically targets individuals looking fo `online dating websites` or `social media`.
 
 ### Case Study
+Six days ago, an email landed in Inbox showing me that my `Facebook` has been `Hacked💀` and all of my security mesaures have been rolled backed. And the funny thin is all this was in `Vietrnamese` language. 
+
+**Email I have recieved.**
+
+Here is the screenshot of the `phishing email` I received:
+![image](https://github.com/dx7er/portfolio/assets/79792270/dd0fae1d-9b52-4857-863b-6799d4920062)
+
+
+**Analysis on Email.**
+
+This is `my analysis` on `recieved email`:
+![image](https://github.com/dx7er/portfolio/assets/79792270/392438ac-091a-4d4b-8237-8c09568f99f3)
+
