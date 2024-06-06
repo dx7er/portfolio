@@ -51,8 +51,25 @@ This is `my analysis` on `recieved email`:
 **Analysis Breakdown Points**
 1. **Legitimate Sender Address:** The email appears to come from `security@facebookmail.com`, which looks legitimate at first glance.
 2. **Generic Greeting:** The email addresses me as "Hello Saqlain," which is somewhat generic but personalized enough to seem authentic.
-3. **Urgency and Fear Tactic:** The message creates a sense of urgency and fear by stating that my account has been accessed without authorization.
+3. **Urgency and Fear Tactic:** The message creates a sense of urgency and fear by stating that my `account has been accessed without authorization`.
 4. **Immediate Action:** It urges immediate action to `Protect your account now` by clicking a button, a common tactic to prompt quick and unconsidered responses.
 5. **Kind Gesture:** The email ends with a kind gesture from `"Facebook's security team"` to build trust.
 6. **Anomaly:** The email contains an anomaly as all the content is in `Vietnamese`, which raises suspicion since my account language settings are different.
 
+
+### Recent FlashBacks
+
+Social engineering attacks have caused significant damage to nations by targeting government agencies, critical infrastructure, and large corporations. Here are a few notable examples:
+
+1. Ukraine Power Grid Attack (2015)
+2. APT-28 & APT-29
+3. The 2016 U.S. Presidential Election
+4. Stuxnet
+
+### Conclusion
+
+Social engineering is a significant threat in today's digital landscape. By understanding the tactics used by attackers and implementing robust security measures, individuals and organizations can better protect themselves from falling victim to these deceptive attacks. Stay vigilant and always verify before you trust.
+
+--- 
+
+If you like this blog do follow me on [GitHub](https://github.com/dx7er), [LinkedIn](https://www.linkedin.com/in/naqvio7/). A supporter is worth a thousand followers [Buy Me a Coffee](https://www.buymeacoffee.com/dx73r).
