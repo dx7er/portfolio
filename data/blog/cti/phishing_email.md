@@ -38,11 +38,21 @@ Six days ago, an email landed in Inbox showing me that my `Facebook` has been `H
 **Email I have recieved.**
 
 Here is the screenshot of the `phishing email` I received:
+
 ![image](https://github.com/dx7er/portfolio/assets/79792270/dd0fae1d-9b52-4857-863b-6799d4920062)
 
 
 **Analysis on Email.**
 
 This is `my analysis` on `recieved email`:
+
 ![image](https://github.com/dx7er/portfolio/assets/79792270/392438ac-091a-4d4b-8237-8c09568f99f3)
+
+**Analysis Breakdown Points**
+1. **Legitimate Sender Address:** The email appears to come from `security@facebookmail.com`, which looks legitimate at first glance.
+2. **Generic Greeting:** The email addresses me as "Hello Saqlain," which is somewhat generic but personalized enough to seem authentic.
+3. **Urgency and Fear Tactic:** The message creates a sense of urgency and fear by stating that my account has been accessed without authorization.
+4. **Immediate Action:** It urges immediate action to `Protect your account now` by clicking a button, a common tactic to prompt quick and unconsidered responses.
+5. **Kind Gesture:** The email ends with a kind gesture from `"Facebook's security team"` to build trust.
+6. **Anomaly:** The email contains an anomaly as all the content is in `Vietnamese`, which raises suspicion since my account language settings are different.
 
