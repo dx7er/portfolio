@@ -14,22 +14,22 @@ Social engineering is a manipulation technique that exploits human psychology to
 ### Stages of Social Engineering
 1. **Research:** Attacker gathers information about the target such as his/her `social media`, `public records`, `interests`, etc. In this stage `Attacker` also plans his social engineering attack and craft his `message`, `email`, etc.
 2. **Hook:** After gaining information about victim, now the goal is to build trust to perform a desired action. Common methods include:
-   - **Phishing Emails:** Fraudulent emails that appear to come from trusted sources.
-   - **Phone Calls:** Calls posing as technical support, customer service, or other authoritative figures.
-   - **Impersonation:** Physical encounters where the attacker impersonates someone the target trusts.
-3. **Play:**: During the play phase, the attacker exploits the established trust to achieve their objective. This invovles:
+   - **Phishing Emails:** `Fraudulent emails` that appear to come from `trusted sources`.
+   - **Phone Calls:** Calls posing as `technical support`, `customer service`, or other authoritative figures.
+   - **Impersonation:** Physical encounters where the attacker impersonates `someone the target trusts`.
+3. **Play:** During the play phase, the attacker exploits the established trust to achieve their objective. This invovles:
    - Extracting Information
    - Delivering Malware
    - Gaining Physical Access
-4. **Exit:** After achieving their goal, the attacker disengages in a manner that minimizes suspicion and covers their tracks. This phase ensures that the target does not realize they have been manipulated, allowing the attacker to use the gained information or access without immediate detection.
+4. **Exit:** After achieving their goal, the attacker `disengages` in a manner that minimizes `suspicion` and covers their tracks. This phase ensures that the target does not realize they have been manipulated, allowing the attacker to use the gained information or access without immediate detection.
 
 
 ### Types of Social Engineering
 Following are types of Social Engineering
-1. **Phishing:** Phishing is a cyberattack that leverages email, phone, SMS, social media or other form of personal communication to entice users to click a malicious link, download infected files or reveal personal information, such as passwords or account numbers.
-2. **Whaling:** A whaling attack is a type of phishing attack that also leverages personal communication to  gain access to a user’s device or personal information.
-3. **Baiting:** Baiting is a type of social engineering attack wherein scammers make false promises to users in order to lure them into revealing personal information or installing malware on the system.
-4. **Smishing:** SMS-phishing, or smishing, is a social engineering attack conducted specifically through SMS messages. In this attack, scammers attempt to lure the user into clicking on a link which directs them to a malicious site. Once on the site, the victim is then prompted to download malicious software and content.
-5. **Hoenytrap:** A honeytrap attack is a social engineering technique that specifically targets individuals looking fo online dating websites or social media.
+1. **Phishing:** Phishing is a cyberattack that leverages `email`, `phone`, `SMS`, `social media` or other form of personal communication to entice users to `click a malicious link`, `download infected files` or `reveal personal information`, such as passwords or account numbers.
+2. **Whaling:** A whaling attack is a type of phishing attack that also leverages `personal communication` to  gain access to a user’s device or personal information.
+3. **Baiting:** Baiting is a type of social engineering attack wherein scammers make `false promises` to users in order to lure them into revealing `personal information` or installing `malware` on the system.
+4. **Smishing:** SMS-phishing, or smishing, is a social engineering attack conducted specifically through `SMS` messages. In this attack, scammers attempt to lure the user into clicking on a link which directs them to a malicious site. Once on the site, the victim is then prompted to download malicious software and content.
+5. **Hoenytrap:** A honeytrap attack is a social engineering technique that specifically targets individuals looking fo `online dating websites` or `social media`.
 
 ### Case Study
